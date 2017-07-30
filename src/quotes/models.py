@@ -3,8 +3,7 @@ from vehicles.models import vehicle_type, vehicle_body
 from datetime import date
 
 # Creating enquiry model.
-class enquiry(models.Model):
-    
+class enquiry(models.Model):    
     # Defining choices for status and load type fields.
     # Status choice fields
     Enquiry = 'EQ'
@@ -13,7 +12,6 @@ class enquiry(models.Model):
         (Enquiry, 'Enquiry'),
         (FinalisedOrder, 'Finalised Order'),
     )
-    
     # Load type choice fields
     ODC = 'ODC'
     Normal = 'FTL'
@@ -36,7 +34,6 @@ class enquiry(models.Model):
     source = models.CharField(max_length=255)
     destination = models.CharField(max_length=255)
     return_location = models.CharField(max_length=255)
-    
     # Since vehicle_type and vehicle_body may be required to alter from admin
     # panel for multiple times in the future, we are defining them as seperate
     # models and using ForeignKey to connect the models in many to one
