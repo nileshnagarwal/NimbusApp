@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'quotes',
     'masters',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'webapp.urls'
@@ -121,3 +124,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CORS_ORIGIN_WHITELIST = ('localhost:8000', 'localhost:3000', \
+'192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
+'192.168.1.10:5050')
+

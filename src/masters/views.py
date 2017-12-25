@@ -5,7 +5,7 @@ from rest_framework import generics
 
 # Create your views here.
 class Vehicle_TypeList(generics.ListCreateAPIView):
-    queryset = Vehicle_type.objects.all()
+    queryset = Vehicle_type.objects.all().order_by('-vehicle_type_id')
     serializer_class = Vehicle_TypeSerializer
 
 
@@ -14,7 +14,7 @@ class Vehicle_TypeDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = Vehicle_TypeSerializer
 
 class Vehicle_BodyList(generics.ListCreateAPIView):
-    queryset = Vehicle_body.objects.all()
+    queryset = Vehicle_body.objects.all().order_by('-vehicle_body_id')
     serializer_class = Vehicle_BodySerializer
 
 
