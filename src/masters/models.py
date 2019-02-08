@@ -1,10 +1,16 @@
+"""
+Models for the Masters Module. This Module has all the masters data which is
+used as foreignkeys in other forms.
+"""
+
 from django.db import models
-from webapp import fields
 
 # Create your models here.
 class Vehicle_type(models.Model):
-    """Defining vehicle types like 40' High Bed 20T, 40' Low Bed 20T
-    etc.""" 
+    """
+    Defining vehicle types like 40' High Bed 20T, 40' Low Bed 20T
+    etc.
+    """
     vehicle_type_id = models.AutoField(primary_key=True)
     vehicle = models.CharField(max_length=20, blank=False, null=False)
     length = models.DecimalField(max_digits=5, decimal_places=2)
@@ -29,10 +35,28 @@ class Transporter(models.Model):
     transporter_id = models.AutoField(primary_key=True)
     transporter = models.CharField(max_length=70, blank=False, null=False)
     primary_mobile = models.PositiveIntegerField(blank=False, null=False)
-    primary_contact = models.CharField(max_length=255, blank=True, null=True)
     primary_person = models.CharField(max_length=40, blank=True, null=True)
     other_contact = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return self.transporter
+
+class Extra_expenses(models.Model):
+    """Add and Edit Extra Expenses Details"""
+    extra_expenses_id = models.AutoField(primary_key=True)
+    extra_expenses = models.CharField(max_length=70, blank=False, null=False)
+
+    def __str__(self):
+        return self.extra_expenses
+
+class Places(models.Model):
+    """A centrailised database of places added in enquiry form etc"""
+    place_id = models.AutoField(primary_key=True)
+    enquiry_id = models.ForeignKey('quotes.Enquiry', on_delete=models.PROTECT)
+    place = models.CharField(max_length=255)
+    lat = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
+    lng = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
+
+    def __str__(self):
+        return self.place

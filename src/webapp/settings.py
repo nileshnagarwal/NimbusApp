@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -127,5 +127,5 @@ STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = ('localhost:8000', 'localhost:3000', \
 '192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
-'192.168.1.10:5050')
+'localhost:4300', '192.168.1.10:5050')
 
