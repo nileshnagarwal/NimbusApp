@@ -1,29 +1,26 @@
-from rest_framework.response import Response
-from django.shortcuts import render
-from rest_framework import status
 from rest_framework import generics
-from masters.models import Vehicle_body, Vehicle_type, Transporter, Extra_expenses
-from masters.serializers import Vehicle_BodySerializer, Vehicle_TypeSerializer, TransporterSerializer, Extra_ExpensesSerializer, Places, PlacesSerializer
+from masters.models import VehicleBody, VehicleType, Transporter, ExtraExpenses
+from masters.serializers import VehicleBodySerializer, VehicleTypeSerializer, TransporterSerializer, ExtraExpensesSerializer, Places, PlacesSerializer
 
 
 # Create your views here.
-class Vehicle_TypeList(generics.ListCreateAPIView):
-    queryset = Vehicle_type.objects.all().order_by('-vehicle_type_id')
-    serializer_class = Vehicle_TypeSerializer
+class VehicleTypeList(generics.ListCreateAPIView):
+    queryset = VehicleType.objects.all().order_by('-vehicle_type_id')
+    serializer_class = VehicleTypeSerializer
 
 
-class Vehicle_TypeDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Vehicle_type.objects.all()
-    serializer_class = Vehicle_TypeSerializer
+class VehicleTypeDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = VehicleType.objects.all()
+    serializer_class = VehicleTypeSerializer
 
-class Vehicle_BodyList(generics.ListCreateAPIView):
-    queryset = Vehicle_body.objects.all().order_by('-vehicle_body_id')
-    serializer_class = Vehicle_BodySerializer
+class VehicleBodyList(generics.ListCreateAPIView):
+    queryset = VehicleBody.objects.all().order_by('-vehicle_body_id')
+    serializer_class = VehicleBodySerializer
 
 
-class Vehicle_BodyDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Vehicle_body.objects.all()
-    serializer_class = Vehicle_BodySerializer
+class VehicleBodyDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = VehicleBody.objects.all()
+    serializer_class = VehicleBodySerializer
 
 class TransporterList(generics.ListCreateAPIView):
     queryset = Transporter.objects.all()
@@ -33,13 +30,13 @@ class TransporterDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Transporter.objects.all()
     serializer_class = TransporterSerializer
 
-class Extra_ExpensesList(generics.ListCreateAPIView):
-    queryset = Extra_expenses.objects.all()
-    serializer_class = Extra_ExpensesSerializer
+class ExtraExpensesList(generics.ListCreateAPIView):
+    queryset = ExtraExpenses.objects.all()
+    serializer_class = ExtraExpensesSerializer
 
-class Extra_ExpensesDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Extra_expenses.objects.all()
-    serializer_class = Extra_ExpensesSerializer
+class ExtraExpensesDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ExtraExpenses.objects.all()
+    serializer_class = ExtraExpensesSerializer
 
 class PlacesList(generics.ListCreateAPIView):
     """Creating List and Post functions for Places model"""

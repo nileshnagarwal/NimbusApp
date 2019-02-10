@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Vehicle_type, Vehicle_body, Transporter
+from .models import VehicleType, VehicleBody, Transporter, ExtraExpenses
 
 # Register your models here.
-admin.site.register(Vehicle_type)
-admin.site.register(Vehicle_body)
+admin.site.register(VehicleType)
+admin.site.register(VehicleBody)
 admin.site.register(Transporter)
+admin.site.register(ExtraExpenses)

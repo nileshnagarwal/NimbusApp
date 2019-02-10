@@ -43,14 +43,13 @@ class Enquiry(models.Model):
     width = models.DecimalField(max_digits=5, decimal_places=2)
     height = models.DecimalField(max_digits=5, decimal_places=2)
     weight = models.DecimalField(max_digits=5, decimal_places=2)
-    return_location = models.CharField(max_length=255, blank=True, null=True)
     # Since vehicle_type and vehicle_body may be required to alter from admin
     # panel for multiple times in the future, we are defining them as seperate
     # models and using ForeignKey to connect the models in many to one
     # relationship.
-    vehicle_type = models.ManyToManyField('masters.Vehicle_type', blank=True)
-    vehicle_body = models.ManyToManyField('masters.Vehicle_body', blank=True)
-    extra_expenses = models.ManyToManyField('masters.Extra_expenses',
+    vehicle_type = models.ManyToManyField('masters.VehicleType', blank=True)
+    vehicle_body = models.ManyToManyField('masters.VehicleBody', blank=True)
+    extra_expenses = models.ManyToManyField('masters.ExtraExpenses',
                                             blank=True)
     load_type = models.CharField(max_length=10, choices=load_type_choices,
                                  default=Normal, blank=False)
@@ -74,4 +73,4 @@ class SupplierQuote(models.Model):
     rate = models.PositiveIntegerField(blank=False, null=False)
     including_fine = models.BooleanField()
     vehicle_avail = models.BooleanField()
-    vehicle_type = models.ManyToManyField('masters.vehicle_type')
+    vehicle_type = models.ManyToManyField('masters.VehicleType')

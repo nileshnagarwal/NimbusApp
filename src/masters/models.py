@@ -6,7 +6,7 @@ used as foreignkeys in other forms.
 from django.db import models
 
 # Create your models here.
-class Vehicle_type(models.Model):
+class VehicleType(models.Model):
     """
     Defining vehicle types like 40' High Bed 20T, 40' Low Bed 20T
     etc.
@@ -21,7 +21,7 @@ class Vehicle_type(models.Model):
     def __str__(self):
         return self.vehicle
 
-class Vehicle_body(models.Model):
+class VehicleBody(models.Model):
     """Defining vehicle body type like half body, full body, open body
      etc."""
     vehicle_body_id = models.AutoField(primary_key=True)
@@ -42,7 +42,7 @@ class Transporter(models.Model):
     def __str__(self):
         return self.transporter
 
-class Extra_expenses(models.Model):
+class ExtraExpenses(models.Model):
     """Add and Edit Extra Expenses Details"""
     extra_expenses_id = models.AutoField(primary_key=True)
     extra_expenses = models.CharField(max_length=70, blank=False, null=False)
