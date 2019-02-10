@@ -52,11 +52,25 @@ class Extra_expenses(models.Model):
 
 class Places(models.Model):
     """A centrailised database of places added in enquiry form etc"""
+
+    # Defining Source/Destination choices. This is to store if the place
+    # stored belongs to source or detination or return location of enquiry.
+    Source = 'Source'
+    Destination = 'Destination'
+    Return = 'Return'
+    src_dest_choices = (
+        (Source, 'Source'),
+        (Destination, 'Destination'),
+        (Return, 'Return'),
+    )
+
     place_id = models.AutoField(primary_key=True)
     enquiry_id = models.ForeignKey('quotes.Enquiry', on_delete=models.PROTECT)
     place = models.CharField(max_length=255)
     lat = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
     lng = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
+    src_dest = models.CharField(max_length=20, choices=src_dest_choices,
+                                blank=False)
 
     def __str__(self):
         return self.place
