@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from masters import views
+from . import views
 
 urlpatterns = [
     url(r'^masters/vehicletype/$', views.VehicleTypeList.as_view()),

@@ -1,6 +1,8 @@
 from rest_framework import generics
-from masters.models import VehicleBody, VehicleType, Transporter, ExtraExpenses
-from masters.serializers import VehicleBodySerializer, VehicleTypeSerializer, TransporterSerializer, ExtraExpensesSerializer, Places, PlacesSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import VehicleBody, VehicleType, Transporter, ExtraExpenses
+from .serializers import VehicleBodySerializer, VehicleTypeSerializer, TransporterSerializer, ExtraExpensesSerializer, Places, PlacesSerializer
 
 
 # Create your views here.
@@ -14,9 +16,15 @@ class VehicleTypeDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = VehicleTypeSerializer
 
 class VehicleBodyList(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = VehicleBody.objects.all().order_by('-vehicle_body_id')
     serializer_class = VehicleBodySerializer
 
+    def get(self, request, format=None):
+        content = {
+            'status': 'request was permitted'
+        }
+        return Response(content)
 
 class VehicleBodyDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = VehicleBody.objects.all()

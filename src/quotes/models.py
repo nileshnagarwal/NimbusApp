@@ -4,6 +4,7 @@ Models for the Quotes Module
 
 from datetime import date
 from django.db import models
+from django.contrib.auth import get_user_model
 
 
 # Creating enquiry model.
@@ -57,6 +58,9 @@ class Enquiry(models.Model):
     enquiry_no = models.CharField(max_length=255, blank=True, null=True)
     loading_date = models.DateTimeField(default=date.today)
     created = models.DateTimeField(auto_now_add=True)
+    # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
+    # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
+    user = models.ForeignKey(get_user_model(), blank=False,null=False,default=4)
 
     def __str__(self):
         return 'Deal No:%s' %(self.enquiry_no)
@@ -74,3 +78,6 @@ class SupplierQuote(models.Model):
     including_fine = models.BooleanField()
     vehicle_avail = models.BooleanField()
     vehicle_type = models.ManyToManyField('masters.VehicleType')
+    # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
+    # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
+    user = models.ForeignKey(get_user_model(), blank=False,null=False,default=4)

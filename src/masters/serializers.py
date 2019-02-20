@@ -3,7 +3,7 @@ Serializers for Masters Module
 """
 
 from rest_framework import serializers
-from masters.models import VehicleType, VehicleBody, Transporter, ExtraExpenses, Places
+from .models import VehicleType, VehicleBody, Transporter, ExtraExpenses, Places
 # Defining serializers for quotes app
 
 

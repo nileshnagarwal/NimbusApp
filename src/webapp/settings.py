@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'quotes',
     'masters',
+    'common',
     'corsheaders',
 ]
 
@@ -105,6 +106,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Changing the default Auth User Model to our Custom User Model
+AUTH_USER_MODEL = 'common.User'
+
+# Simple JWT DRF 3rd Party Plugin.
+# Refer: https://github.com/davesque/django-rest-framework-simplejwt
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
@@ -128,4 +140,3 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_WHITELIST = ('localhost:8000', 'localhost:3000', \
 '192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
 'localhost:4300', '192.168.1.10:5050')
-
