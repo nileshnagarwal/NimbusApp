@@ -7,6 +7,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 
+# Model Managers are added here.
+# UserManager is overriden to change username to email
 class UserManager(BaseUserManager):
     """Define a model manager for User model with no username field."""
 
@@ -41,6 +43,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 # Create your models here.
+# User model is overriden to add user_type and change username to email.
 class User(AbstractUser):
     """Base User Model + userType field"""
 
