@@ -7,6 +7,7 @@ from .serializers import VehicleBodySerializer, VehicleTypeSerializer, Transport
 
 # Create your views here.
 class VehicleTypeList(generics.ListCreateAPIView):
+    permission_classes = (IsAuthenticated,)
     queryset = VehicleType.objects.all().order_by('-vehicle_type_id')
     serializer_class = VehicleTypeSerializer
 
@@ -19,12 +20,6 @@ class VehicleBodyList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = VehicleBody.objects.all().order_by('-vehicle_body_id')
     serializer_class = VehicleBodySerializer
-
-    def get(self, request, format=None):
-        content = {
-            'status': 'request was permitted'
-        }
-        return Response(content)
 
 class VehicleBodyDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = VehicleBody.objects.all()

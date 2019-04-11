@@ -7,4 +7,5 @@
 *.DS_Store
 *.swp
 *.out
+*.sqlite3
 env/

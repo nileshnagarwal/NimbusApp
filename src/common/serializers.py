@@ -1,6 +1,8 @@
 """
 Serializers for the Quotes Module
 """
+from django.utils.six import text_type
+
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer)
@@ -25,3 +27,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['user_type'] = user.user_type
 
         return token
+    
+    def validate(self, attrs):        
+        data = super(TokenObtainPairSerializer, self).validate(attrs)
+
+        refresh = self.get_token(self.user)
+
+        data['refresh_token'] = text_type(refresh)
+        data['access_token'] = text_type(refresh.access_token)
+
+        return {"token": data}
