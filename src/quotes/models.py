@@ -60,7 +60,7 @@ class Enquiry(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
-    user = models.ForeignKey(get_user_model(), blank=False,null=False,default=4)
+    user = models.ForeignKey(get_user_model(), blank=False,null=False)
 
     def __str__(self):
         return 'Deal No:%s' %(self.enquiry_no)
