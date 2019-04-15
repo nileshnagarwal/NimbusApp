@@ -65,7 +65,8 @@ class Places(models.Model):
     )
 
     place_id = models.AutoField(primary_key=True)
-    enquiry_id = models.ForeignKey('quotes.Enquiry', on_delete=models.PROTECT)
+    enquiry_id = models.ForeignKey('quotes.Enquiry', related_name='places', 
+                                    on_delete=models.PROTECT)
     place = models.CharField(max_length=255)
     lat = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
     lng = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
