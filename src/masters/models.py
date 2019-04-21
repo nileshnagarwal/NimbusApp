@@ -65,6 +65,8 @@ class Places(models.Model):
     )
 
     place_id = models.AutoField(primary_key=True)
+    # Related Name is used to define reverse relation in enquiry serializer
+    # Refer: https://www.django-rest-framework.org/api-guide/relations/#reverse-relations
     enquiry_id = models.ForeignKey('quotes.Enquiry', related_name='places', 
                                     on_delete=models.PROTECT)
     place = models.CharField(max_length=255)
