@@ -70,8 +70,9 @@ class Places(models.Model):
     enquiry_id = models.ForeignKey('quotes.Enquiry', related_name='places', 
                                     on_delete=models.PROTECT)
     place = models.CharField(max_length=255)
-    lat = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
-    lng = models.DecimalField(max_digits=18, decimal_places=14, blank=True, null=True)
+    lat = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
+    lng = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
+    place_id_agm = models.CharField(max_length=255)
     src_dest = models.CharField(max_length=20, choices=src_dest_choices,
                                 blank=False)
 
