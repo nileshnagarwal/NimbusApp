@@ -70,14 +70,16 @@ class SupplierQuote(models.Model):
     Enter the quotes received from vendors for the received enquiries.
     """
     quote_id = models.AutoField(primary_key=True)
-    enquiry = models.ForeignKey('Enquiry', blank=False, null=True,
+    enquiry_id = models.ForeignKey('Enquiry', blank=False, null=True,
                                 on_delete=models.SET_NULL)
-    transporter = models.ForeignKey('masters.Transporter', blank=False,
+    transporter_id = models.ForeignKey('masters.Transporter', blank=False,
                                     null=True, on_delete=models.SET_NULL)
-    rate = models.PositiveIntegerField(blank=False, null=False)
-    including_fine = models.BooleanField()
-    vehicle_avail = models.BooleanField()
-    vehicle_type = models.ManyToManyField('masters.VehicleType')
+    freight = models.PositiveIntegerField(blank=False, null=False)
+    including_fine = models.CharField(max_length=20)
+    vehicle_avail = models.CharField(max_length=20)
+    vehicle_type_id = models.ManyToManyField('masters.VehicleType')
+    vehicle_body_id = models.ManyToManyField('masters.VehicleBody')
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
-    user = models.ForeignKey(get_user_model(), blank=False,null=False,default=4)
+    user_id = models.ForeignKey(get_user_model(), blank=False,null=False)
+    comments = models.TextField(blank=True, null=True)
