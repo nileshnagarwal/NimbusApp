@@ -14,6 +14,8 @@ import os
 
 from datetime import timedelta
 
+import django_heroku
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -147,3 +149,6 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_WHITELIST = ('localhost:8000', 'localhost:3000', \
 '192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
 'localhost:4300', '192.168.1.10:5050')
+
+# Activate Django-Heroku.
+django_heroku.settings(locals())
