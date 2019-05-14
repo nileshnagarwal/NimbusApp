@@ -10,6 +10,7 @@
 *.sqlite3
 *.sqlite
 env/
+.vscode/
 
 ## not getting ignored!!
 src/db.sqlite3
