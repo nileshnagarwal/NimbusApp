@@ -156,7 +156,8 @@ STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = ('localhost:8000', 'localhost:3000', \
 '192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
-'localhost:4300', '192.168.1.10:5050')
+'localhost:4300', '192.168.1.10:5050', 'neeluroadways.in', \
+'nimbuslogistics.in')
 
 # Heroku: Update database configuration from $DATABASE_URL.
 import dj_database_url
