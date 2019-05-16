@@ -5,6 +5,8 @@ used as foreignkeys in other forms.
 
 from django.db import models
 
+from webapp.validators import MobileValidation
+
 # Create your models here.
 class VehicleType(models.Model):
     """
@@ -34,7 +36,8 @@ class Transporter(models.Model):
     """Add and Edit Transporter Details"""
     transporter_id = models.AutoField(primary_key=True)
     transporter = models.CharField(max_length=70, blank=False, null=False)
-    primary_mobile = models.PositiveIntegerField(blank=False, null=False)
+    primary_mobile = models.CharField(max_length=10,
+        validators=[MobileValidation(length=10, start_with='6-9')], blank=False, null=False)
     primary_person = models.CharField(max_length=40, blank=True, null=True)
     other_contact = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
