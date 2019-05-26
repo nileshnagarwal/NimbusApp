@@ -6,6 +6,8 @@ from datetime import date
 from django.db import models
 from django.contrib.auth import get_user_model
 
+def get_sentinel_user():
+    return get_user_model().objects.get_or_create(email='deleted@nimbuslogistics.in')[0]
 
 # Creating enquiry model.
 class Enquiry(models.Model):
@@ -60,7 +62,7 @@ class Enquiry(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
-    user = models.ForeignKey(get_user_model(), blank=False,null=False)
+    user = models.ForeignKey(get_user_model(), blank=False,null=False, on_delete=models.SET(get_sentinel_user))
 
     def __str__(self):
         return 'Deal No:%s' %(self.enquiry_no)
@@ -71,9 +73,9 @@ class SupplierQuote(models.Model):
     """
     quote_id = models.AutoField(primary_key=True)
     enquiry_id = models.ForeignKey('Enquiry', blank=False, null=True,
-                                on_delete=models.SET_NULL)
+                                on_delete=models.PROTECT)
     transporter_id = models.ForeignKey('masters.Transporter', blank=False,
-                                    null=True, on_delete=models.SET_NULL)
+                                    null=True, on_delete=models.PROTECT)
     freight = models.PositiveIntegerField(blank=False, null=False)
     including_fine = models.CharField(max_length=20)
     vehicle_avail = models.CharField(max_length=20)
@@ -81,5 +83,5 @@ class SupplierQuote(models.Model):
     vehicle_body_id = models.ManyToManyField('masters.VehicleBody')
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
-    user_id = models.ForeignKey(get_user_model(), blank=False,null=False)
+    user_id = models.ForeignKey(get_user_model(), blank=False,null=False, on_delete=models.SET(get_sentinel_user))
     comments = models.TextField(blank=True, null=True)
