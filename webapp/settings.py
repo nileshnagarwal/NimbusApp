@@ -34,6 +34,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 ALLOWED_HOSTS = [
     'nimbusdjango.herokuapp.com',
     '127.0.0.1',
+    'localhost'
 ]
 
 
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'masters',
     'common',
     'corsheaders',
+    "fcm_django"
 ]
 
 MIDDLEWARE = [
@@ -158,7 +160,7 @@ CORS_ORIGIN_WHITELIST = ('localhost:8000', 'localhost:3000', \
 '192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
 'localhost:4300', '192.168.1.10:5050', 'neeluroadways.in', \
 'nimbuslogistics.in', 'https://www.neeluroadways.in', \
-'https://www.neeluroadways.in/')
+'https://www.neeluroadways.in/', '')
 
 # Heroku: Update database configuration from $DATABASE_URL.
 import dj_database_url
@@ -168,3 +170,8 @@ DATABASES['default'].update(db_from_env)
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# fcm-django settings. Refer: https://github.com/xtrinch/fcm-django
+FCM_DJANGO_SETTINGS = {
+        "FCM_SERVER_KEY": "AAAA1Nux2xE:APA91bFBRJQS0dZijI1llkBEwwmvVoL8iPuP5BOKZjPcoKECGFZd6Sqv3Cq38j2AiKBDESDYHmmVxObn-8IJTxRz6BRcXhVmvqRDMYqC0q0aExtpDab8ENg6IQtnLsMuWHuyWSYfr8Ly",
+}

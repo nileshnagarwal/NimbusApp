@@ -15,10 +15,18 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from rest_framework.routers import DefaultRouter
+
+from fcm_django.api.rest_framework import FCMDeviceAuthorizedViewSet
+
 from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from common.views import MyTokenObtainPairView
+
+router = DefaultRouter()
+
+router.register(r'devices', FCMDeviceAuthorizedViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -27,6 +35,7 @@ urlpatterns = [
     url(r'^', include('common.urls')),
     url(r'^api/token/$', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
+    url(r'^', include(router.urls)), # Adding URL for fcm-django package
 ]
 
 # TEMP DELETE IF NOT REQUIRED
