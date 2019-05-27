@@ -1,5 +1,5 @@
 """
-Serializers for the Quotes Module
+Serializers for the Common Module
 """
 from django.utils.six import text_type
 
@@ -7,6 +7,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import (
     TokenObtainPairSerializer)
 from .models import User
+from fcm_django.models import FCMDevice
 # Defining serializers for common app
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,3 +38,14 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         data['access_token'] = text_type(refresh.access_token)
 
         return {"token": data}
+
+class FCMDevicesSerializer(serializers.ModelSerializer):
+    """
+    Custom FCMDevices Serializer
+    """
+    user = UserSerializer()
+
+    class Meta:
+        model = FCMDevice
+        fields = ('registration_id', 'name', 'active', 'user',
+                    'device_id', 'type')
