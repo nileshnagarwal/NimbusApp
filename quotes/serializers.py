@@ -33,34 +33,34 @@ class EnquirySerializer(serializers.ModelSerializer):
     places_destination_obj = serializers.SerializerMethodField('get_destination_obj', read_only=True)
 
     def get_source(self, enquiry):
-        qs = Places.objects.filter(src_dest="Source", enquiry_id=enquiry.enquiry_id)
+        qs = Places.objects.filter(src_dest="Source", enquiry_id=enquiry.enquiry_id).order_by('place_id')
         serializer = PlacesSerializer(instance=qs, many=True)
         places = serializer.data
         places_arr = [d['place'] for d in places if 'place' in d]
         return places_arr
     
     def get_destination(self, enquiry):
-        qs = Places.objects.filter(src_dest="Destination", enquiry_id=enquiry.enquiry_id)
+        qs = Places.objects.filter(src_dest="Destination", enquiry_id=enquiry.enquiry_id).order_by('place_id')
         serializer = PlacesSerializer(instance=qs, many=True)
         places = serializer.data
         places_arr = [d['place'] for d in places if 'place' in d]
         return places_arr
 
     def get_return(self, enquiry):
-        qs = Places.objects.filter(src_dest="Return", enquiry_id=enquiry.enquiry_id)
+        qs = Places.objects.filter(src_dest="Return", enquiry_id=enquiry.enquiry_id).order_by('place_id')
         serializer = PlacesSerializer(instance=qs, many=True)
         places = serializer.data
         places_arr = [d['place'] for d in places if 'place' in d]
         return places_arr
 
     def get_source_obj(self, enquiry):
-        qs = Places.objects.filter(src_dest="Source", enquiry_id=enquiry.enquiry_id)
+        qs = Places.objects.filter(src_dest="Source", enquiry_id=enquiry.enquiry_id).order_by('place_id')
         serializer = PlacesSerializer(instance=qs, many=True)
         places = serializer.data
         return places 
     
     def get_destination_obj(self, enquiry):
-        qs = Places.objects.filter(src_dest="Destination", enquiry_id=enquiry.enquiry_id)
+        qs = Places.objects.filter(src_dest="Destination", enquiry_id=enquiry.enquiry_id).order_by('place_id')
         serializer = PlacesSerializer(instance=qs, many=True)
         places = serializer.data
         return places 
