@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'masters',
     'common',
     'corsheaders',
-    "fcm_django"
+    "fcm_django",
+    'import_export'
 ]
 
 MIDDLEWARE = [
