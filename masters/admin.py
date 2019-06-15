@@ -20,7 +20,7 @@ class TransporterResource(resources.ModelResource):
         import_id_fields = ('transporter_id',)
         # When import_id_fields is used, fields need to be explicitly specified
         fields = ('transporter_id', 'transporter', 'primary_mobile',  'primary_person',
-                    'other_contact', 'address',)
+                    'other_contact', 'address', 'office_location', 'office_lat', 'office_lng', )
 
 class TransporterAdmin(ImportExportModelAdmin):
     resource_class = TransporterResource

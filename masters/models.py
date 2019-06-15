@@ -41,6 +41,10 @@ class Transporter(models.Model):
     primary_person = models.CharField(max_length=40, blank=True, null=True)
     other_contact = models.CharField(max_length=255, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
+    office_location = models.CharField(max_length=255, blank=True, null=True)
+    office_lat = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
+    office_lng = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
+
 
     def __str__(self):
         return self.transporter
