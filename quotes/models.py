@@ -80,7 +80,7 @@ class SupplierQuote(models.Model):
     including_fine = models.CharField(max_length=20)
     vehicle_avail = models.CharField(max_length=20)
     vehicle_type_id = models.ManyToManyField('masters.VehicleType')
-    vehicle_body_id = models.ManyToManyField('masters.VehicleBody')
+    vehicle_body_id = models.ManyToManyField('masters.VehicleBody', blank=True)
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
     user_id = models.ForeignKey(get_user_model(), blank=False,null=False, on_delete=models.SET(get_sentinel_user))
