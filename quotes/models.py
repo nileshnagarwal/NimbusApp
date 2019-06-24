@@ -63,6 +63,7 @@ class Enquiry(models.Model):
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
     user = models.ForeignKey(get_user_model(), blank=False,null=False, on_delete=models.SET(get_sentinel_user))
+    modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return 'Deal No:%s' %(self.enquiry_no)
@@ -85,3 +86,5 @@ class SupplierQuote(models.Model):
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
     user_id = models.ForeignKey(get_user_model(), blank=False,null=False, on_delete=models.SET(get_sentinel_user))
     comments = models.TextField(blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
