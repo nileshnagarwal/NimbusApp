@@ -5,7 +5,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from quotes.models import Enquiry, SupplierQuote
-from quotes.serializers import EnquirySerializer, SupplierQuoteSerializer
+from quotes.serializers import EnquiryDetailedSerializer, SupplierQuoteSerializer
 from masters.serializers import PlacesSerializer
 from fcm_django.models import FCMDevice
 from common.models import User
@@ -20,7 +20,7 @@ class EnquiryList(generics.ListCreateAPIView):
     serializers.
     """
     queryset = Enquiry.objects.all()
-    serializer_class = EnquirySerializer
+    serializer_class = EnquiryDetailedSerializer
 
     # Overriding the post() to handle creating the place
     def post(self, request, *args, **kwargs):
@@ -30,7 +30,7 @@ class EnquiryList(generics.ListCreateAPIView):
         return_loc = request.data.pop("return")
 
         # Next we save the enquiry to get enquiry_id
-        enq_serializer = EnquirySerializer(data=request.data)
+        enq_serializer = EnquiryDetailedSerializer(data=request.data)
         if enq_serializer.is_valid():
             enquiry = enq_serializer.save()
             # Now we need to save the enquiry_id and src_dest in
@@ -71,7 +71,7 @@ class EnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
     Generic EnquiryDetail View
     """
     queryset = Enquiry.objects.all()
-    serializer_class = EnquirySerializer
+    serializer_class = EnquiryDetailedSerializer
 
 class SupplierQuoteList(generics.ListCreateAPIView):
     """
@@ -86,6 +86,19 @@ class SupplierQuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = SupplierQuote.objects.all()
     serializer_class = SupplierQuoteSerializer
+
+class SupplierQuotesForEnquiry(generics.ListCreateAPIView):
+    """
+    Generic EnquiryDetail View
+    """
+    queryset = SupplierQuote.objects.all()
+    serializer_class = SupplierQuoteSerializer
+
+    def get(self, request, pk, *args, **kwargs):
+        quotes = SupplierQuote.objects.filter(enquiry_id=self.kwargs['pk'])
+        # When serializing a list of objects, add many=True
+        serializer = SupplierQuoteSerializer(quotes, many=True)
+        return Response(serializer.data)
 
 def send_enq_notification(enquiry, enquiry_id, sources, destinations):
     """

@@ -11,6 +11,24 @@ from masters.models import Places
 
 class EnquirySerializer(serializers.ModelSerializer):
     """
+    Enquiry Model Basic ModelSerializer. 
+    Has only the fields present in the model.
+    """
+    class Meta:
+        model = Enquiry
+        fields = '__all__'
+
+class EnquirySerializer(serializers.ModelSerializer):
+    """
+    Enquiry Model Basic ModelSerializer. 
+    Has only the fields present in the model.
+    """
+    class Meta:
+        model = Enquiry
+        fields = '__all__'
+
+class EnquiryDetailedSerializer(serializers.ModelSerializer):
+    """
     Enquiry Model Serializer.
     """
 
@@ -33,18 +51,10 @@ class EnquirySerializer(serializers.ModelSerializer):
     places_destination_obj = serializers.SerializerMethodField('get_destination_obj', read_only=True)
 
     def get_source(self, enquiry):
-        qs = Places.objects.filter(src_dest="Source", enquiry_id=enquiry.enquiry_id).order_by('place_id')
-        serializer = PlacesSerializer(instance=qs, many=True)
-        places = serializer.data
-        places_arr = [d['place'] for d in places if 'place' in d]
-        return places_arr
+        return get_source(self, enquiry.enquiry_id)
     
     def get_destination(self, enquiry):
-        qs = Places.objects.filter(src_dest="Destination", enquiry_id=enquiry.enquiry_id).order_by('place_id')
-        serializer = PlacesSerializer(instance=qs, many=True)
-        places = serializer.data
-        places_arr = [d['place'] for d in places if 'place' in d]
-        return places_arr
+        return get_destination(self, enquiry.enquiry_id)
 
     def get_return(self, enquiry):
         qs = Places.objects.filter(src_dest="Return", enquiry_id=enquiry.enquiry_id).order_by('place_id')
@@ -80,6 +90,32 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
     """
     SupplierQuotes Model Serializer.
     """
+    transporter_str = serializers.StringRelatedField(source='transporter_id', read_only=True)
+    enquiry_no = serializers.StringRelatedField(source='enquiry_id', read_only=True)
+    places_source = serializers.SerializerMethodField('get_source', read_only=True)
+    places_destination = serializers.SerializerMethodField('get_destination', read_only=True)
+    enquiry = EnquirySerializer(source='enquiry_id', read_only=True)
+    
+    def get_source(self, quote):
+        return get_source(self, quote.enquiry_id)
+
+    def get_destination(self, quote):
+        return get_destination(self, quote.enquiry_id)
+    
     class Meta:
         model = SupplierQuote
         fields = '__all__'
+
+def get_source(self, enquiry_id):
+    qs = Places.objects.filter(src_dest="Source", enquiry_id=enquiry_id).order_by('place_id')
+    serializer = PlacesSerializer(instance=qs, many=True)
+    places = serializer.data
+    places_arr = [d['place'] for d in places if 'place' in d]
+    return places_arr
+
+def get_destination(self, enquiry_id):
+    qs = Places.objects.filter(src_dest="Destination", enquiry_id=enquiry_id).order_by('place_id')
+    serializer = PlacesSerializer(instance=qs, many=True)
+    places = serializer.data
+    places_arr = [d['place'] for d in places if 'place' in d]
+    return places_arr

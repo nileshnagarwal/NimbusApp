@@ -66,7 +66,7 @@ class Enquiry(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return 'Deal No:%s' %(self.enquiry_no)
+        return self.enquiry_no
 
 class SupplierQuote(models.Model):
     """
@@ -88,3 +88,6 @@ class SupplierQuote(models.Model):
     comments = models.TextField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.quote_id
