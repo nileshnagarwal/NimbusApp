@@ -5,7 +5,7 @@ from .serializers import UserSerializer, MyTokenObtainPairSerializer
 
 # Create your views here.
 class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('email')
     serializer_class = UserSerializer
 
 

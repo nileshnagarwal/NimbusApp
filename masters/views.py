@@ -26,7 +26,7 @@ class VehicleBodyDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = VehicleBodySerializer
 
 class TransporterList(generics.ListCreateAPIView):
-    queryset = Transporter.objects.all()
+    queryset = Transporter.objects.all().order_by('transporter')
     serializer_class = TransporterSerializer
 
 class TransporterDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -34,7 +34,7 @@ class TransporterDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TransporterSerializer
 
 class ExtraExpensesList(generics.ListCreateAPIView):
-    queryset = ExtraExpenses.objects.all()
+    queryset = ExtraExpenses.objects.all().order_by('extra_expenses')
     serializer_class = ExtraExpensesSerializer
 
 class ExtraExpensesDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -43,23 +43,8 @@ class ExtraExpensesDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class PlacesList(generics.ListCreateAPIView):
     """Creating List and Post functions for Places model"""
-    queryset = Places.objects.all()
+    queryset = Places.objects.all().order_by('place_id')
     serializer_class = PlacesSerializer
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.DATA, many=True)
-    #     if serializer.is_valid():
-    #         print("Serializer is Valid")
-    #         print("Serializer Value is ", repr(serializer.data))
-    #         serializer.save()
-    #         headers = self.get_success_headers(serializer.data)
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED,
-    #                         headers=headers)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    # def get_serializer(self, instance=None, data=None,
-    #                 files=None, many=True, partial=False):
-    #     return super(PlacesList, self).get_serializer(instance, data, files,
-    #                                                 many, partial)
 
 class PlacesDetail(generics.RetrieveUpdateDestroyAPIView):
     """Creating RUD functions for Places model"""

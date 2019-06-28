@@ -19,7 +19,7 @@ class EnquiryList(generics.ListCreateAPIView):
     destinations as array of objects. We need to pop this out and pass it to the resp
     serializers.
     """
-    queryset = Enquiry.objects.all()
+    queryset = Enquiry.objects.all().order_by('-created', 'enquiry_no')
     serializer_class = EnquiryDetailedSerializer
 
     # Overriding the post() to handle creating the place
@@ -77,7 +77,7 @@ class SupplierQuoteList(generics.ListCreateAPIView):
     """
     Generic Supplier Quote List and Create View
     """
-    queryset = SupplierQuote.objects.all()
+    queryset = SupplierQuote.objects.all().order_by('-created')
     serializer_class = SupplierQuoteSerializer
 
 class SupplierQuoteDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -91,7 +91,7 @@ class SupplierQuotesForEnquiry(generics.ListCreateAPIView):
     """
     Generic EnquiryDetail View
     """
-    queryset = SupplierQuote.objects.all()
+    queryset = SupplierQuote.objects.all().order_by('-created')
     serializer_class = SupplierQuoteSerializer
 
     def get(self, request, pk, *args, **kwargs):
