@@ -5,6 +5,7 @@ Models for the Quotes Module
 from datetime import date
 from django.db import models
 from django.contrib.auth import get_user_model
+from masters.models import Transporter
 
 def get_sentinel_user():
     return get_user_model().objects.get_or_create(email='deleted@nimbuslogistics.in')[0]
@@ -90,4 +91,4 @@ class SupplierQuote(models.Model):
     modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.quote_id
+        return 'Enq#%s - %s' %(self.enquiry_id, self.transporter_id)
