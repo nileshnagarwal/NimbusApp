@@ -4,8 +4,9 @@ Views for the Quotes module.
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from quotes.models import Enquiry, SupplierQuote
-from quotes.serializers import EnquiryDetailedSerializer, SupplierQuoteSerializer
+from quotes.models import Enquiry, SupplierQuote, ConfirmEnquiry
+from quotes.serializers import (EnquiryDetailedSerializer, SupplierQuoteSerializer,
+                                ConfirmEnquirySerializer, EnquirySerializer)
 from masters.serializers import PlacesSerializer
 from fcm_django.models import FCMDevice
 from common.models import User
@@ -72,6 +73,41 @@ class EnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Enquiry.objects.all()
     serializer_class = EnquiryDetailedSerializer
+
+class ConfirmEnquiryList(generics.ListCreateAPIView):
+    """
+    Generic Confirm Enquiry List and Create View
+    """
+    queryset = ConfirmEnquiry.objects.all().order_by('-created')
+    serializer_class = ConfirmEnquirySerializer
+
+    def post(self, request, *args, **kwargs):
+        """
+        Override Post to convert the original enquiry_no from F* to C*
+        """
+        # request.data is immutable Dict. To make it mutable, we must use .copy()
+        # Refer: https://docs.djangoproject.com/en/dev/ref/
+        # request-response/#django.http.QueryDict
+        con_enquiry_data = request.data.copy()
+        original_enq = Enquiry.objects.get(enquiry_id=request.data['enquiry_id'])
+        enq_ser = EnquirySerializer(original_enq)
+        enquiry_no = enq_ser.data['enquiry_no']
+        # Fast Method to edit a section of a string
+        enquiry_no = "C" + enquiry_no[1:]
+        con_enquiry_data['enquiry_no'] = enquiry_no
+        con_enquiry_ser = ConfirmEnquirySerializer(data=con_enquiry_data)
+        if con_enquiry_ser.is_valid():
+            con_enquiry = con_enquiry_ser.save()
+            return Response(con_enquiry_ser.data, status.HTTP_201_CREATED)
+        return Response(con_enquiry_ser.errors, status.HTTP_400_BAD_REQUEST)
+
+
+class ConfirmEnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Generic Confirm Enquiry Detail View, Update and Delete
+    """
+    queryset = ConfirmEnquiry.objects.all()
+    serializer_class = ConfirmEnquirySerializer
 
 class SupplierQuoteList(generics.ListCreateAPIView):
     """

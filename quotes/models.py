@@ -69,6 +69,19 @@ class Enquiry(models.Model):
     def __str__(self):
         return self.enquiry_no
 
+class ConfirmEnquiry(models.Model):
+    """
+    Additional Enquiry details for Enquiries converted to confirm from Floated
+    """
+    enquiry_id = models.ForeignKey('Enquiry', blank=False, null=False,
+                                    on_delete=models.PROTECT)
+    enquiry_no = models.CharField(max_length=255, blank=True, null=True)
+    loading_date = models.DateField(blank=False, null=False)
+    comments = models.TextField(max_length=255, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+
+
 class SupplierQuote(models.Model):
     """
     Enter the quotes received from vendors for the received enquiries.
