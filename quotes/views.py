@@ -101,13 +101,33 @@ class ConfirmEnquiryList(generics.ListCreateAPIView):
             return Response(con_enquiry_ser.data, status.HTTP_201_CREATED)
         return Response(con_enquiry_ser.errors, status.HTTP_400_BAD_REQUEST)
 
-
 class ConfirmEnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic Confirm Enquiry Detail View, Update and Delete
     """
     queryset = ConfirmEnquiry.objects.all()
     serializer_class = ConfirmEnquirySerializer
+
+class ConfirmEnquiryCompleteList(generics.ListAPIView):
+    """
+    Confirm Enquiry Combined List from Enquiry and ComfirmEnquiry Models
+    """
+    queryset = ConfirmEnquiry.objects.all().order_by('-created')
+    serializer_class = ConfirmEnquirySerializer
+
+    def get(self, request, *args, **kwargs):
+        """
+        Override get to list all confirmed enquiries from Enquiry and ConfirmEnquiry
+        Models
+        """
+        enq_qs = Enquiry.objects.filter(status='Confirmed Order').order_by('-created')
+        con_enq_qs = ConfirmEnquiry.objects.all().order_by('-created')
+        enquiry_ser = EnquiryDetailedSerializer(enq_qs, many=True)
+        con_enq_ser = ConfirmEnquirySerializer(con_enq_qs, many=True)
+        return Response({
+            'direct_confirmed_orders': enquiry_ser.data,
+            'convert_confirmed_orders': enquiry_ser.data
+        })
 
 class SupplierQuoteList(generics.ListCreateAPIView):
     """
