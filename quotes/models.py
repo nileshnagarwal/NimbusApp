@@ -76,7 +76,7 @@ class ConfirmEnquiry(models.Model):
     enquiry_id = models.ForeignKey('Enquiry', blank=False, null=False,
                                     on_delete=models.PROTECT)
     enquiry_no = models.CharField(max_length=255, blank=True, null=True)
-    loading_date = models.DateField(blank=False, null=False)
+    loading_date = models.DateTimeField(blank=False, null=False)
     comments = models.TextField(max_length=255, blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
