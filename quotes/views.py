@@ -8,10 +8,16 @@ from quotes.models import Enquiry, SupplierQuote, ConfirmEnquiry
 from quotes.serializers import (EnquiryDetailedSerializer, SupplierQuoteSerializer,
                                 ConfirmEnquirySerializer, EnquirySerializer)
 from masters.serializers import PlacesSerializer
+from masters.models import Places, VehicleType
 from fcm_django.models import FCMDevice
 from common.models import User
 
+from common.functions.haversine import haversine
+
 from datetime import datetime, timedelta
+import pytz # Imported to set Timezone
+import dateutil.parser
+from decimal import Decimal
 
 # Create your views here.
 class EnquiryList(generics.ListCreateAPIView):
@@ -73,6 +79,100 @@ class EnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Enquiry.objects.all()
     serializer_class = EnquiryDetailedSerializer
+
+class EnquirySearchList(generics.ListAPIView):
+    """
+    Search Enquiries based on criteria
+    """
+    serializer_class = EnquiryDetailedSerializer
+
+    def get_queryset(self):
+        """
+        Overrides get_queryset function to search enquiries based on
+        criteria received and returns the filtered enquiries.
+        """
+        # First store the data received in request in local variables
+        try:
+            from_date = self.request.data['from_date']
+            to_date = self.request.data['to_date']
+            # Change date from str to datetime
+            from_date = dateutil.parser.parse(from_date)
+            to_date = dateutil.parser.parse(to_date)
+        except:
+            from_date = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.UTC)
+            to_date = datetime(2100, 1, 1, 0, 0, 0, 0, tzinfo=pytz.UTC)
+        try:
+            vehicle_type = self.request.data['vehicle_type']
+            # Change vehicle_type from str to int array
+            vehicle_type = [int(x.strip()) for x in \
+                vehicle_type.strip('[]').split(',') if x]
+        except:
+            vehicle_type = VehicleType.objects.all().\
+                values_list('vehicle_type_id', flat=True)
+        try:
+            status = self.request.data['status']
+        except:
+            status_provided = False
+        try:
+            source_lat = self.request.data['source_lat']
+            source_lng = self.request.data['source_lng']
+            source_rad = self.request.data['source_rad']
+            # Change lat, long from str to decimal
+            source_lat = Decimal(source_lat.strip())
+            source_lng = Decimal(source_lng.strip())
+            source_rad = Decimal(source_rad.strip())
+            # First we will filter for location        
+            # Get source places
+            source_places = Places.objects.filter(src_dest__exact='Source')
+            # Local variable to store array of enquiry_ids of enquiries having
+            # matching source destination criteria
+            enq_ids = []
+            # Filter out the source places that match criteria
+            # Looping through the source_places, we check for criteria and save
+            # enquiry_id of places that pass the criteria
+            for place in source_places:
+                if (haversine(source_lat, source_lng, place.lat, place.lng)) \
+                    < source_rad:
+                    enq_ids.append(place.enquiry_id.enquiry_id)
+        except:
+            # If source criteria is not provided, enq_ids will contain all enquiries
+            enq_ids = Enquiry.objects.all().values_list('enquiry_id', flat=True)
+            print(len(enq_ids))
+        try:
+            dest_lat = self.request.data['dest_lat']
+            dest_lng = self.request.data['dest_lng']
+            dest_rad = self.request.data['dest_rad']
+            dest_lat = Decimal(dest_lat.strip())
+            dest_lng = Decimal(dest_lng.strip())
+            dest_rad = Decimal(dest_rad.strip())           
+            # Filter out the destination places that match criteria
+            # Looping through the destination places, we remove the enquiry_ids
+            # of plaaces that fail the criteria
+            dest_places = Places.objects.filter(enquiry_id__in=enq_ids, \
+                            src_dest__exact='Destination')
+            for place in dest_places:
+                if (haversine(dest_lat, dest_lng, place.lat, place.lng)) \
+                    > dest_rad:
+                    try:
+                        enq_ids.remove(place.enquiry_id.enquiry_id)
+                    except:
+                        pass
+        except:
+            pass
+        
+        # Finally apply all the filters to Enquiry Model Manager
+        # .distinct() helps to avoid duplicates in our queryset
+        # Refer: https://stackoverflow.com/a/38452675/3608786
+        if status_provided:
+            qs = Enquiry.objects.filter(loading_date__gte=from_date, \
+                loading_date__lte=to_date, vehicle_type__in=vehicle_type, \
+                status__exact=status, enquiry_id__in=enq_ids).distinct()\
+                .order_by('-enquiry_id')
+        else:
+            qs = Enquiry.objects.filter(loading_date__gte=from_date, \
+                loading_date__lte=to_date, vehicle_type__in=vehicle_type, \
+                enquiry_id__in=enq_ids).distinct().order_by('-enquiry_id')
+        return qs
 
 class ConfirmEnquiryList(generics.ListCreateAPIView):
     """
