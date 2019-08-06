@@ -22,9 +22,9 @@ from decimal import Decimal
 # Create your views here.
 class EnquiryList(generics.ListCreateAPIView):
     """
-    This view gets enquiry data in request. This data also has the multiple sources and
-    destinations as array of objects. We need to pop this out and pass it to the resp
-    serializers.
+    This view gets enquiry data in request. This data also has the multiple sources
+    and destinations as array of objects. We need to pop this out and pass it to
+    the resp serializers.
     """
     queryset = Enquiry.objects.all().order_by('-created', 'enquiry_no')
     serializer_class = EnquiryDetailedSerializer
@@ -63,14 +63,18 @@ class EnquiryList(generics.ListCreateAPIView):
                         source_serializer.save()
                         destination_serializer.save()
                         return_serializer.save()
-                        send_enq_notification(request.data, enquiry.enquiry_id, sources, destinations)
+                        send_enq_notification(request.data, enquiry.enquiry_id, \
+                            sources, destinations)
                         return Response(enq_serializer.data, status.HTTP_201_CREATED)
                     source_serializer.save()
                     destination_serializer.save()
-                    send_enq_notification(request.data, enquiry.enquiry_id, sources, destinations)
+                    send_enq_notification(request.data, enquiry.enquiry_id, sources,\
+                        destinations)
                     return Response(enq_serializer.data, status.HTTP_201_CREATED)
-                return Response(destination_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            return Response(source_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(destination_serializer.errors, \
+                    status=status.HTTP_400_BAD_REQUEST)
+            return Response(source_serializer.errors, \
+                status=status.HTTP_400_BAD_REQUEST)
         return Response(enq_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -84,6 +88,7 @@ class EnquirySearchList(generics.ListAPIView):
     """
     Search Enquiries based on criteria
     """
+    
     serializer_class = EnquiryDetailedSerializer
 
     def get_queryset(self):
@@ -92,31 +97,37 @@ class EnquirySearchList(generics.ListAPIView):
         criteria received and returns the filtered enquiries.
         """
         # First store the data received in request in local variables
-        try:
-            from_date = self.request.data['from_date']
-            to_date = self.request.data['to_date']
-            # Change date from str to datetime
+        
+        std_from_date = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.UTC)
+        std_to_date = datetime(2100, 1, 1, 0, 0, 0, 0, tzinfo=pytz.UTC)
+        from_date = self.request.query_params.get('from_date', std_from_date)
+        to_date = self.request.query_params.get('to_date', std_to_date)            
+        # Change date from str to datetime
+        if from_date != std_from_date:
             from_date = dateutil.parser.parse(from_date)
+        if to_date != std_to_date:
             to_date = dateutil.parser.parse(to_date)
-        except:
-            from_date = datetime(2000, 1, 1, 0, 0, 0, 0, tzinfo=pytz.UTC)
-            to_date = datetime(2100, 1, 1, 0, 0, 0, 0, tzinfo=pytz.UTC)
-        try:
-            vehicle_type = self.request.data['vehicle_type']
-            # Change vehicle_type from str to int array
+        
+        vehicle_type = self.request.query_params.get('vehicle_type', None)
+        # Change vehicle_type from str to int array
+        if vehicle_type is not None:
             vehicle_type = [int(x.strip()) for x in \
-                vehicle_type.strip('[]').split(',') if x]
-        except:
-            vehicle_type = VehicleType.objects.all().\
-                values_list('vehicle_type_id', flat=True)
-        try:
-            status = self.request.data['status']
-        except:
-            status_provided = False
-        try:
-            source_lat = self.request.data['source_lat']
-            source_lng = self.request.data['source_lng']
-            source_rad = self.request.data['source_rad']
+                            vehicle_type.strip('[]').split(',') if x]
+            if vehicle_type.__len__()== 0:
+                # If vehicle_type is blank array, get all vehicle types
+                vehicle_type = VehicleType.objects.all().\
+                    values_list('vehicle_type_id', flat=True)
+        if vehicle_type is None:
+                # If vehicle_type was not received, get all vehicle types
+                vehicle_type = VehicleType.objects.all().\
+                    values_list('vehicle_type_id', flat=True)
+        
+        status = self.request.query_params.get('status', None)        
+
+        source_lat = self.request.query_params.get('source_lat', None)
+        source_lng = self.request.query_params.get('source_lng', None)
+        source_rad = self.request.query_params.get('source_rad', None)
+        if (source_lat and source_lng and source_rad is not None):
             # Change lat, long from str to decimal
             source_lat = Decimal(source_lat.strip())
             source_lng = Decimal(source_lng.strip())
@@ -133,18 +144,20 @@ class EnquirySearchList(generics.ListAPIView):
             for place in source_places:
                 if (haversine(source_lat, source_lng, place.lat, place.lng)) \
                     < source_rad:
-                    enq_ids.append(place.enquiry_id.enquiry_id)
-        except:
+                    if not place.enquiry_id.enquiry_id in enq_ids:
+                        enq_ids.append(place.enquiry_id.enquiry_id)
+            
+        else:
             # If source criteria is not provided, enq_ids will contain all enquiries
-            enq_ids = Enquiry.objects.all().values_list('enquiry_id', flat=True)
-            print(len(enq_ids))
-        try:
-            dest_lat = self.request.data['dest_lat']
-            dest_lng = self.request.data['dest_lng']
-            dest_rad = self.request.data['dest_rad']
+            enq_ids = list(Enquiry.objects.all().values_list('enquiry_id', flat=True))        
+        
+        dest_lat = self.request.query_params.get('dest_lat', None)
+        dest_lng = self.request.query_params.get('dest_lng', None)
+        dest_rad = self.request.query_params.get('dest_rad', None)
+        if (dest_lat and dest_lng and dest_rad is not None):
             dest_lat = Decimal(dest_lat.strip())
             dest_lng = Decimal(dest_lng.strip())
-            dest_rad = Decimal(dest_rad.strip())           
+            dest_rad = Decimal(dest_rad.strip())
             # Filter out the destination places that match criteria
             # Looping through the destination places, we remove the enquiry_ids
             # of plaaces that fail the criteria
@@ -153,17 +166,15 @@ class EnquirySearchList(generics.ListAPIView):
             for place in dest_places:
                 if (haversine(dest_lat, dest_lng, place.lat, place.lng)) \
                     > dest_rad:
-                    try:
+                    if place.enquiry_id.enquiry_id in enq_ids:
                         enq_ids.remove(place.enquiry_id.enquiry_id)
-                    except:
-                        pass
-        except:
-            pass
-        
+                else:                
+                    enq_ids.append(place.enquiry_id.enquiry_id)
+                    
         # Finally apply all the filters to Enquiry Model Manager
         # .distinct() helps to avoid duplicates in our queryset
-        # Refer: https://stackoverflow.com/a/38452675/3608786
-        if status_provided:
+        # Refer: https://stackoverflow.com/a/38452675/3608786        
+        if status is not None or '':
             qs = Enquiry.objects.filter(loading_date__gte=from_date, \
                 loading_date__lte=to_date, vehicle_type__in=vehicle_type, \
                 status__exact=status, enquiry_id__in=enq_ids).distinct()\
