@@ -92,19 +92,18 @@ class ConfirmEnquiry(generics.UpdateAPIView):
     serializer_class = EnquiryDetailedSerializer
 
     def patch(self, request, *args, **kwargs):        
+        # Get access to the instance that is being confirmed
         instance = self.get_object()
-        print(instance)
-        print(self)
-        print(request)
-        print(args)
-        print(kwargs)
+        # Create a dict with the confirmation data that needs to be patched
         cnf = {}
         cnf['data'] = request.data.copy()
         cnf['data']['cnf_enquiry_no'] = "C" + instance.enquiry_no[1:]
         cnf['data']['cnf_created'] = datetime.now().isoformat() 
         cnf['data']['status'] = Enquiry.FinalisedOrder
-        print(cnf['data'])
-        serializer = EnquirySerializer(instance,data=cnf['data'], partial=True)        
+        # partial=True allows serializer.isvalid without sharing all
+        # mandatory data
+        serializer = EnquirySerializer(instance,data=cnf['data'], \
+            partial=True)
         serializer.is_valid()
         serializer.save()
         return Response(serializer.data, status.HTTP_202_ACCEPTED)
@@ -262,6 +261,20 @@ class SupplierQuoteList(generics.ListCreateAPIView):
     queryset = SupplierQuote.objects.all().order_by('-created')
     serializer_class = SupplierQuoteSerializer
 
+    def get(self, request, *args, **kwargs):
+        # Get user_type from request
+        user_type = request.user.user_type
+        # If user is developers, admin or sales person, show quotes from all users
+        if user_type==User.developer or user_type==User.admin or user_type==User.sales:
+            quotes = SupplierQuote.objects.all().order_by('-quote_id') 
+        # Else show quotes from themselves only
+        else:
+            quotes = SupplierQuote.objects.filter(user_id__exact=request.user.id)\
+                .order_by('-quote_id')
+        # When serializing a list of objects, add many=True
+        serializer = SupplierQuoteSerializer(quotes, many=True)
+        return Response(serializer.data)
+
 class SupplierQuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic EnquiryDetail View
@@ -277,7 +290,15 @@ class SupplierQuotesForEnquiry(generics.ListCreateAPIView):
     serializer_class = SupplierQuoteSerializer
 
     def get(self, request, pk, *args, **kwargs):
-        quotes = SupplierQuote.objects.filter(enquiry_id=self.kwargs['pk'])
+        # Get user_type from request
+        user_type = request.user.user_type
+        # If user is developers, admin or sales person, show quotes from all users
+        if user_type==User.developer or user_type==User.admin or user_type==User.sales:
+            quotes = SupplierQuote.objects.filter(enquiry_id=self.kwargs['pk'])   
+        # Else show quotes from themselves only
+        else:
+            quotes = SupplierQuote.objects.filter(enquiry_id=self.kwargs['pk'], \
+            user_id__exact=request.user.id)
         # When serializing a list of objects, add many=True
         serializer = SupplierQuoteSerializer(quotes, many=True)
         return Response(serializer.data)
