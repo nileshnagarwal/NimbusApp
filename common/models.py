@@ -47,12 +47,18 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     """Base User Model + userType field"""
 
+    developer = 1
+    admin = 2
+    sales = 3
+    traffic_incharge = 4
+    accounts = 5
+
     USERTYPE_CHOICES = (
-        (1, 'Developer'),
-        (2, 'Admin'),
-        (3, 'Sales'),
-        (4, 'Traffic Incharge'),
-        (5, 'Accounts'),
+        (developer, 'Developer'),
+        (admin, 'Admin'),
+        (sales, 'Sales'),
+        (traffic_incharge, 'Traffic Incharge'),
+        (accounts, 'Accounts'),
     )
 
     username = None
