@@ -18,11 +18,10 @@ class Enquiry(models.Model):
     """
     # Defining choices for status and load type fields.
     # Status choice fields
-
     FloatedEnquiry = 'Floated Enquiry'
     UnfloatedEnquiry = 'Unfloated Enquiry'
     FinalisedOrder = 'Confirmed Order'
-    status_choices = (
+    _status_choices = (
         (FloatedEnquiry, 'Floated Enquiry'),
         (UnfloatedEnquiry, 'Unfloated Enquiry'),
         (FinalisedOrder, 'Confirmed Order'),
@@ -32,7 +31,7 @@ class Enquiry(models.Model):
     Normal = 'Normal'
     Part = 'Part'
     Container = 'Container'
-    load_type_choices = (
+    _load_type_choices = (
         (ODC, 'ODC'),
         (Normal, 'Normal'),
         (Part, 'Part'),
@@ -41,7 +40,7 @@ class Enquiry(models.Model):
 
     # Defining model fields
     enquiry_id = models.AutoField(primary_key=True)
-    status = models.CharField(max_length=20, choices=status_choices,
+    status = models.CharField(max_length=20, choices=_status_choices,
                               default=UnfloatedEnquiry, blank=False)
     length = models.DecimalField(max_digits=5, decimal_places=2)
     width = models.DecimalField(max_digits=5, decimal_places=2)
@@ -55,7 +54,7 @@ class Enquiry(models.Model):
     vehicle_body = models.ManyToManyField('masters.VehicleBody', blank=True)
     extra_expenses = models.ManyToManyField('masters.ExtraExpenses',
                                             blank=True)
-    load_type = models.CharField(max_length=10, choices=load_type_choices,
+    load_type = models.CharField(max_length=10, choices=_load_type_choices,
                                  default=Normal, blank=False)
     comments = models.TextField(blank=True, null=True)
     enquiry_no = models.CharField(max_length=255, blank=True, null=True)
@@ -65,21 +64,13 @@ class Enquiry(models.Model):
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
     user = models.ForeignKey(get_user_model(), blank=False,null=False, on_delete=models.SET(get_sentinel_user))
     modified = models.DateTimeField(auto_now=True)
+    cnf_enquiry_no = models.CharField(max_length=255, blank=True, null=True)        
+    cnf_loading_date = models.DateTimeField(blank=True, null=True)
+    cnf_comments = models.TextField(blank=True, null=True)
+    cnf_created = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.enquiry_no
-
-class ConfirmEnquiry(models.Model):
-    """
-    Additional Enquiry details for Enquiries converted to confirm from Floated
-    """
-    enquiry_id = models.ForeignKey('Enquiry', blank=False, null=False,
-                                    on_delete=models.PROTECT)
-    enquiry_no = models.CharField(max_length=255, blank=True, null=True)
-    loading_date = models.DateTimeField(blank=False, null=False)
-    comments = models.TextField(max_length=255, blank=True, null=True)
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
 
 
 class SupplierQuote(models.Model):

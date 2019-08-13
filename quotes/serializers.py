@@ -4,7 +4,7 @@ Serializers for the Quotes Module
 from rest_framework import serializers
 from masters.serializers import (VehicleBodySerializer, VehicleTypeSerializer,
     ExtraExpensesSerializer, PlacesSerializer)
-from quotes.models import Enquiry, SupplierQuote, ConfirmEnquiry
+from quotes.models import Enquiry, SupplierQuote
 from masters.models import Places
 
 # Defining serializers for quotes app
@@ -84,15 +84,9 @@ class EnquiryDetailedSerializer(serializers.ModelSerializer):
                     'comments', 'enquiry_no', 'loading_date', 'created', 'places_str', 
                     'places_obj', 'vehicle_type_str', 'vehicle_type_obj', 'vehicle_body_str', 
                     'vehicle_body_obj', 'extra_expenses_str', 'extra_expenses_obj', 'user', 'places_source',
-                    'places_destination', 'places_return', 'places_source_obj', 'places_destination_obj')
+                    'places_destination', 'places_return', 'places_source_obj', 'places_destination_obj',
+                    'cnf_enquiry_no', 'cnf_loading_date', 'cnf_comments', 'cnf_created', 'modified')
 
-class ConfirmEnquirySerializer(serializers.ModelSerializer):
-    """
-    ConfirmEnquiry Models Serializer
-    """
-    class Meta:
-        model = ConfirmEnquiry
-        fields = '__all__'
 
 class SupplierQuoteSerializer(serializers.ModelSerializer):
     """

@@ -4,16 +4,16 @@ Views for the Quotes module.
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
-from quotes.models import Enquiry, SupplierQuote, ConfirmEnquiry
+from quotes.models import Enquiry, SupplierQuote
 from quotes.serializers import (EnquiryDetailedSerializer, SupplierQuoteSerializer,
-                                ConfirmEnquirySerializer, EnquirySerializer)
+                                EnquirySerializer)
 from masters.serializers import PlacesSerializer
 from masters.models import Places, VehicleType
 from fcm_django.models import FCMDevice
 from common.models import User
 
 from common.functions.haversine import haversine
-
+import datetime
 from datetime import datetime, timedelta
 import pytz # Imported to set Timezone
 import dateutil.parser
@@ -84,12 +84,58 @@ class EnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Enquiry.objects.all()
     serializer_class = EnquiryDetailedSerializer
 
+class ConfirmEnquiry(generics.UpdateAPIView):
+    """
+    Confirm Floated Enquiry by providing all the required fields
+    """
+    queryset = Enquiry.objects.all()
+    serializer_class = EnquiryDetailedSerializer
+
+    def patch(self, request, *args, **kwargs):        
+        instance = self.get_object()
+        print(instance)
+        print(self)
+        print(request)
+        print(args)
+        print(kwargs)
+        cnf = {}
+        cnf['data'] = request.data.copy()
+        cnf['data']['cnf_enquiry_no'] = "C" + instance.enquiry_no[1:]
+        cnf['data']['cnf_created'] = datetime.now().isoformat() 
+        cnf['data']['status'] = Enquiry.FinalisedOrder
+        print(cnf['data'])
+        serializer = EnquirySerializer(instance,data=cnf['data'], partial=True)        
+        serializer.is_valid()
+        serializer.save()
+        return Response(serializer.data, status.HTTP_202_ACCEPTED)
+
+
 class EnquirySearchList(generics.ListAPIView):
     """
     Search Enquiries based on criteria
     """
     
     serializer_class = EnquiryDetailedSerializer
+
+    @staticmethod
+    def filter_date_status(qs, status, from_date, to_date):
+        """
+        Function takes a qs to be filtered and acc to the status received, it decides
+        if loading_date is to be used for filtering or cnf_loading_date is to be used.
+        """
+        if Enquiry.FinalisedOrder in status:
+            return qs.filter(cnf_loading_date__gte=from_date, \
+                cnf_loading_date__lte=to_date, status__exact=status).distinct() \
+                .order_by('-enquiry_id')
+        elif Enquiry.UnfloatedEnquiry in status:
+            return qs.filter(cnf_loading_date__gte=from_date, \
+                cnf_loading_date__lte=to_date, status__exact=status).distinct() \
+                .order_by('-enquiry_id')
+        elif Enquiry.FloatedEnquiry in status:
+            return qs.filter(loading_date__gte=from_date, \
+                loading_date__lte=to_date, status__exact=status).distinct() \
+                .order_by('-enquiry_id')
+
 
     def get_queryset(self):
         """
@@ -122,8 +168,10 @@ class EnquirySearchList(generics.ListAPIView):
                 vehicle_type = VehicleType.objects.all().\
                     values_list('vehicle_type_id', flat=True)
         
+        # Get status from query params
         status = self.request.query_params.get('status', None)        
 
+        # Get source data from query params
         source_lat = self.request.query_params.get('source_lat', None)
         source_lng = self.request.query_params.get('source_lng', None)
         source_rad = self.request.query_params.get('source_rad', None)
@@ -151,6 +199,7 @@ class EnquirySearchList(generics.ListAPIView):
             # If source criteria is not provided, enq_ids will contain all enquiries
             enq_ids = list(Enquiry.objects.all().values_list('enquiry_id', flat=True))        
         
+        # Get destination data from query params
         dest_lat = self.request.query_params.get('dest_lat', None)
         dest_lng = self.request.query_params.get('dest_lng', None)
         dest_rad = self.request.query_params.get('dest_rad', None)
@@ -170,75 +219,41 @@ class EnquirySearchList(generics.ListAPIView):
                         enq_ids.remove(place.enquiry_id.enquiry_id)
                 else:                
                     enq_ids.append(place.enquiry_id.enquiry_id)
-                    
-        # Finally apply all the filters to Enquiry Model Manager
-        # .distinct() helps to avoid duplicates in our queryset
-        # Refer: https://stackoverflow.com/a/38452675/3608786        
-        if status is not None or '':
-            qs = Enquiry.objects.filter(loading_date__gte=from_date, \
-                loading_date__lte=to_date, vehicle_type__in=vehicle_type, \
-                status__exact=status, enquiry_id__in=enq_ids).distinct()\
-                .order_by('-enquiry_id')
+        
+        # Filter the queryset using vehicle_type, source and destination
+        qs = Enquiry.objects.filter(vehicle_type__in=vehicle_type, \
+            enquiry_id__in=enq_ids).distinct().order_by('-enquiry_id')
+
+        # For filtering according to status, we need to check the status
+        # and accordingly apply filters to loading_date or cnf_loading_date
+        # qs_arr is used for storing all querysets for various status options
+        qs_arr = []
+        # status_arr is used to store the possible status options
+        status_arr = []
+        
+        # Check if we've received blank status value
+        if status is None or status.isspace():
+            # If yes we store all possible status values in status_arr
+            for a, b in Enquiry._status_choices:
+                status_arr.append(a)        
         else:
-            qs = Enquiry.objects.filter(loading_date__gte=from_date, \
-                loading_date__lte=to_date, vehicle_type__in=vehicle_type, \
-                enquiry_id__in=enq_ids).distinct().order_by('-enquiry_id')
-        return qs
-
-class ConfirmEnquiryList(generics.ListCreateAPIView):
-    """
-    Generic Confirm Enquiry List and Create View
-    """
-    queryset = ConfirmEnquiry.objects.all().order_by('-created')
-    serializer_class = ConfirmEnquirySerializer
-
-    def post(self, request, *args, **kwargs):
-        """
-        Override Post to convert the original enquiry_no from F* to C*
-        """
-        # request.data is immutable Dict. To make it mutable, we must use .copy()
-        # Refer: https://docs.djangoproject.com/en/dev/ref/
-        # request-response/#django.http.QueryDict
-        con_enquiry_data = request.data.copy()
-        original_enq = Enquiry.objects.get(enquiry_id=request.data['enquiry_id'])
-        enq_ser = EnquirySerializer(original_enq)
-        enquiry_no = enq_ser.data['enquiry_no']
-        # Fast Method to edit a section of a string
-        enquiry_no = "C" + enquiry_no[1:]
-        con_enquiry_data['enquiry_no'] = enquiry_no
-        con_enquiry_ser = ConfirmEnquirySerializer(data=con_enquiry_data)
-        if con_enquiry_ser.is_valid():
-            con_enquiry = con_enquiry_ser.save()
-            return Response(con_enquiry_ser.data, status.HTTP_201_CREATED)
-        return Response(con_enquiry_ser.errors, status.HTTP_400_BAD_REQUEST)
-
-class ConfirmEnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
-    """
-    Generic Confirm Enquiry Detail View, Update and Delete
-    """
-    queryset = ConfirmEnquiry.objects.all()
-    serializer_class = ConfirmEnquirySerializer
-
-class ConfirmEnquiryCompleteList(generics.ListAPIView):
-    """
-    Confirm Enquiry Combined List from Enquiry and ComfirmEnquiry Models
-    """
-    queryset = ConfirmEnquiry.objects.all().order_by('-created')
-    serializer_class = ConfirmEnquirySerializer
-
-    def get(self, request, *args, **kwargs):
-        """
-        Override get to list all confirmed enquiries from Enquiry and ConfirmEnquiry
-        Models
-        """
-        enq_qs = Enquiry.objects.filter(status='Confirmed Order').order_by('-created')
-        con_enq_qs = ConfirmEnquiry.objects.all().order_by('-created')
-        enquiry_ser = EnquiryDetailedSerializer(enq_qs, many=True)
-        con_enq_ser = ConfirmEnquirySerializer(con_enq_qs, many=True)
-        return Response({
-            'direct_confirmed_orders': enquiry_ser.data,
-            'convert_confirmed_orders': enquiry_ser.data
-        })
+            # Else we store the status value received
+            status_arr.append(status)
+        
+        # Next we call the filter_date_status function to filter data
+        # acc to the status values to be filtered
+        for i, status in enumerate(status_arr):
+            qs_arr.append(EnquirySearchList.filter_date_status(qs, status,\
+                from_date, to_date))
+        
+        # We combine the querysets to create the final queryset
+        qs_final = Enquiry.objects.none() # Create blank queryset
+        for qs_part in qs_arr:
+            qs_final = qs_final | qs_part # | is used to combine querysets
+        
+        # .distinct() helps to avoid duplicates in our queryset
+        # Refer: https://stackoverflow.com/a/38452675/3608786
+        return qs_final.distinct()
 
 class SupplierQuoteList(generics.ListCreateAPIView):
     """
