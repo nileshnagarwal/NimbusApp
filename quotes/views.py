@@ -36,8 +36,19 @@ class EnquiryList(generics.ListCreateAPIView):
         destinations = request.data.pop("destinations")
         return_loc = request.data.pop("return")
 
-        # Next we save the enquiry to get enquiry_id
-        enq_serializer = EnquiryDetailedSerializer(data=request.data)
+        # Check if the enquiry is Unfloated Confirmed
+        if Enquiry.UnfloatedEnquiry==request.data['status']:
+            data_copy = request.data.copy()
+            data_copy['cnf_enquiry_no'] = data_copy['enquiry_no']
+            data_copy['cnf_loading_date'] = data_copy['loading_date']
+            data_copy['cnf_comments'] = data_copy['comments']
+            data_copy['cnf_created'] = datetime.now().isoformat()
+            # Next we save the enquiry to get enquiry_id
+            # If unfloated, save using data_copy else using request.data
+            enq_serializer = EnquiryDetailedSerializer(data=data_copy)
+        else:
+            enq_serializer = EnquiryDetailedSerializer(data=request.data)
+        
         if enq_serializer.is_valid():
             enquiry = enq_serializer.save()
             # Now we need to save the enquiry_id and src_dest in
