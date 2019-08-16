@@ -102,22 +102,27 @@ class ConfirmEnquiry(generics.UpdateAPIView):
     queryset = Enquiry.objects.all()
     serializer_class = EnquiryDetailedSerializer
 
-    def patch(self, request, *args, **kwargs):        
+    def patch(self, request, *args, **kwargs):
         # Get access to the instance that is being confirmed
         instance = self.get_object()
-        # Create a dict with the confirmation data that needs to be patched
-        cnf = {}
-        cnf['data'] = request.data.copy()
-        cnf['data']['cnf_enquiry_no'] = "C" + instance.enquiry_no[1:]
-        cnf['data']['cnf_created'] = datetime.now().isoformat() 
-        cnf['data']['status'] = Enquiry.FinalisedOrder
-        # partial=True allows serializer.isvalid without sharing all
-        # mandatory data
-        serializer = EnquirySerializer(instance,data=cnf['data'], \
-            partial=True)
-        serializer.is_valid()
-        serializer.save()
-        return Response(serializer.data, status.HTTP_202_ACCEPTED)
+        # Check if already confirmed
+        if instance.cnf_loading_date == None:
+            # Create a dict with the confirmation data that needs to be patched
+            cnf = {}
+            cnf['data'] = request.data.copy()
+            cnf['data']['cnf_enquiry_no'] = "C" + instance.enquiry_no[1:]
+            cnf['data']['cnf_created'] = datetime.now().isoformat() 
+            cnf['data']['status'] = Enquiry.FinalisedOrder
+            # partial=True allows serializer.isvalid without sharing all
+            # mandatory data
+            serializer = EnquirySerializer(instance,data=cnf['data'], \
+                partial=True)
+            serializer.is_valid()
+            serializer.save()
+            return Response(serializer.data, status.HTTP_202_ACCEPTED)
+        # If already confirmed, return error
+        else:
+            return Response({'error': 'Enquiry is already confirmed'}, status.HTTP_409_CONFLICT)
 
 
 class EnquirySearchList(generics.ListAPIView):
