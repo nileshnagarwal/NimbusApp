@@ -14,7 +14,7 @@ class VehicleType(models.Model):
     etc.
     """
     vehicle_type_id = models.AutoField(primary_key=True)
-    vehicle = models.CharField(max_length=20, blank=False, null=False)
+    vehicle = models.CharField(max_length=30, blank=False, null=False)
     length = models.DecimalField(max_digits=5, decimal_places=2)
     width = models.DecimalField(max_digits=5, decimal_places=2)
     height = models.DecimalField(max_digits=5, decimal_places=2)

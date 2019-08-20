@@ -8,7 +8,7 @@ from .serializers import VehicleBodySerializer, VehicleTypeSerializer, Transport
 # Create your views here.
 class VehicleTypeList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
-    queryset = VehicleType.objects.all().order_by('-vehicle_type_id')
+    queryset = VehicleType.objects.all().order_by('-vehicle')
     serializer_class = VehicleTypeSerializer
 
 
