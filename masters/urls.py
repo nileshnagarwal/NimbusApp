@@ -12,4 +12,6 @@ urlpatterns = [
     url(r'^masters/extraexpenses/(?P<pk>[0-9]+)/$', views.ExtraExpensesDetail.as_view()),
     url(r'^masters/places/$', views.PlacesList.as_view()),
     url(r'^masters/places/(?P<pk>[0-9]+)/$', views.PlacesDetail.as_view()),
+    url(r'^masters/districts/$', views.DistrictList.as_view()),
+    url(r'^masters/districts/(?P<pk>[0-9]+)/$', views.DistrictDetail.as_view()),
 ]

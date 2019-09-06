@@ -3,7 +3,8 @@ Serializers for Masters Module
 """
 
 from rest_framework import serializers
-from .models import VehicleType, VehicleBody, Transporter, ExtraExpenses, Places
+from .models import VehicleType, VehicleBody, Transporter, ExtraExpenses, \
+    Places, District
 # Defining serializers for quotes app
 
 
@@ -45,4 +46,12 @@ class PlacesSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Places
+        fields = '__all__'
+
+class DistrictSerializer(serializers.ModelSerializer):
+    """
+    District ModelSerializer.
+    """
+    class Meta:
+        model = District
         fields = '__all__'

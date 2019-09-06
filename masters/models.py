@@ -4,6 +4,7 @@ used as foreignkeys in other forms.
 """
 
 from django.db import models
+# from django.contrib.postgres.fields import ArrayField
 
 from webapp.validators import MobileValidation
 
@@ -82,6 +83,50 @@ class Places(models.Model):
     place_id_agm = models.CharField(max_length=255)
     src_dest = models.CharField(max_length=20, choices=src_dest_choices,
                                 blank=False)
+    district_id = models.ForeignKey('District', related_name='place',
+                                    on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return self.place
+
+class District(models.Model):
+    """
+    Model for storing District Names with respective data like lat, lng etc
+    """
+    district_id = models.AutoField(primary_key=True)
+    district = models.CharField(max_length=255, blank=False, null=False)
+    state = models.CharField(max_length=255, blank=False, null=False)
+    lat = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
+    lng = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
+
+    def __str__(self):
+        return '%s, %s' %(self.district, self.state)
+
+# class TransporterProfile(models.Model):
+#     """
+#     Model for storing Transporter Business Profile which helps search the right 
+#     transporter for each enquiry
+#     """
+#     # Load type choice fields
+#     ODC = 'ODC'
+#     Normal = 'Normal'
+#     Part = 'Part'
+#     Container = 'Container'
+#     _load_type_choices = (
+#         (ODC, 'ODC'),
+#         (Normal, 'Normal'),
+#         (Part, 'Part'),
+#         (Container, 'Container'),
+#     )
+
+#     trans_profile_id = models.AutoField(primary_key=True)
+#     transporter_id = models.ForeignKey('masters.Transporter', related_name='trans_profile',
+#                         on_delete=models.PROTECT, blank=False, null=False)
+#     source_id = models.ManyToManyField('masters.District', related_name='trans_profile_source',
+#                         on_delete=models.PROTECT, blank=False, null=False)
+#     destination_id = models.ManyToManyField('masters.District', on_delete=models.PROTECT,
+#                         related_name='trans_profile_dest', blank=False, null=False)
+#     vehicle_type_id = models.ManyToManyField('masters.VehicleType', on_delete=models.PROTECT,
+#                         related_name='trans_profile_veh_type', blank=False, null=False)
+#     load_type = ArrayField(models.CharField(choices=_load_type_choices, max_length=10, 
+#                         blank=False, null=False))

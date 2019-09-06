@@ -1,8 +1,10 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .models import VehicleBody, VehicleType, Transporter, ExtraExpenses
-from .serializers import VehicleBodySerializer, VehicleTypeSerializer, TransporterSerializer, ExtraExpensesSerializer, Places, PlacesSerializer
+from .models import VehicleBody, VehicleType, Transporter, ExtraExpenses, District
+from .serializers import VehicleBodySerializer, VehicleTypeSerializer, \
+    TransporterSerializer, ExtraExpensesSerializer, Places, PlacesSerializer, \
+        DistrictSerializer
 
 
 # Create your views here.
@@ -50,3 +52,13 @@ class PlacesDetail(generics.RetrieveUpdateDestroyAPIView):
     """Creating RUD functions for Places model"""
     queryset = Places.objects.all()
     serializer_class = PlacesSerializer
+
+class DistrictList(generics.ListCreateAPIView):
+    """Creating List and Post functions for District model"""
+    queryset = District.objects.all().order_by('district_id')
+    serializer_class = DistrictSerializer
+
+class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
+    """Creating RUD functions for District model"""
+    queryset = District.objects.all()
+    serializer_class = DistrictSerializer
