@@ -6,6 +6,8 @@ urlpatterns = [
     url(r'^masters/vehiclebody/$', views.VehicleBodyList.as_view()),
     url(r'^masters/vehicletype/(?P<pk>[0-9]+)/$', views.VehicleTypeDetail.as_view()),
     url(r'^masters/vehiclebody/(?P<pk>[0-9]+)/$', views.VehicleBodyDetail.as_view()),
+    url(r'^masters/loadtype/$', views.LoadTypeList.as_view()),
+    url(r'^masters/loadtype/(?P<pk>[0-9]+)/$', views.LoadTypeDetail.as_view()),
     url(r'^masters/transporter/$', views.TransporterList.as_view()),
     url(r'^masters/transporter/(?P<pk>[0-9]+)/$', views.TransporterDetail.as_view()),
     url(r'^masters/extraexpenses/$', views.ExtraExpensesList.as_view()),

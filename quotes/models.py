@@ -56,13 +56,16 @@ class Enquiry(models.Model):
                                             blank=True)
     load_type = models.CharField(max_length=10, choices=_load_type_choices,
                                  default=Normal, blank=False)
+    load_type_new = models.ForeignKey('masters.LoadType', blank=True, 
+                                null=True, on_delete=models.PROTECT)
     comments = models.TextField(blank=True, null=True)
     enquiry_no = models.CharField(max_length=255, blank=True, null=True)
     loading_date = models.DateTimeField(default=date.today)
     created = models.DateTimeField(auto_now_add=True)
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
     # Refer: https://docs.djangoproject.com/en/2.1/topics/auth/customizing/#referencing-the-user-model
-    user = models.ForeignKey(get_user_model(), blank=False,null=False, on_delete=models.SET(get_sentinel_user))
+    user = models.ForeignKey(get_user_model(), blank=False,null=False, 
+                            on_delete=models.SET(get_sentinel_user))
     modified = models.DateTimeField(auto_now=True)
     cnf_enquiry_no = models.CharField(max_length=255, blank=True, null=True)        
     cnf_loading_date = models.DateTimeField(blank=True, null=True)

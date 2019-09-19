@@ -1,7 +1,8 @@
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
-from .models import VehicleType, VehicleBody, Transporter, ExtraExpenses, District
+from .models import VehicleType, VehicleBody, LoadType, \
+    Transporter, ExtraExpenses, District
 
 class TransporterResource(resources.ModelResource):
     """
@@ -40,6 +41,7 @@ class DistrictAdmin(ImportExportModelAdmin):
 # Register your models here.
 admin.site.register(VehicleType)
 admin.site.register(VehicleBody)
+admin.site.register(LoadType)
 admin.site.register(ExtraExpenses)
 admin.site.register(Transporter, TransporterAdmin)
 admin.site.register(District, DistrictAdmin)

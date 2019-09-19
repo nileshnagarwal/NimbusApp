@@ -3,8 +3,8 @@ Serializers for Masters Module
 """
 
 from rest_framework import serializers
-from .models import VehicleType, VehicleBody, Transporter, ExtraExpenses, \
-    Places, District
+from .models import VehicleType, VehicleBody, LoadType, Transporter, \
+    ExtraExpenses, Places, District
 # Defining serializers for quotes app
 
 
@@ -22,6 +22,14 @@ class VehicleBodySerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = VehicleBody
+        fields = '__all__'
+
+class LoadTypeSerializer(serializers.ModelSerializer):
+    """
+    Load Type ModelSerializer.
+    """
+    class Meta:
+        model = LoadType
         fields = '__all__'
 
 class TransporterSerializer(serializers.ModelSerializer):
