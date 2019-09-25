@@ -116,17 +116,6 @@ class TransporterProfile(models.Model):
     Model for storing Transporter Business Profile which helps search the right 
     transporter for each enquiry
     """
-    # Load type choice fields
-    ODC = 'ODC'
-    Normal = 'Normal'
-    Part = 'Part'
-    Container = 'Container'
-    _load_type_choices = (
-        (ODC, 'ODC'),
-        (Normal, 'Normal'),
-        (Part, 'Part'),
-        (Container, 'Container'),
-    )
 
     trans_profile_id = models.AutoField(primary_key=True)
     transporter_id = models.ForeignKey('masters.Transporter', related_name='trans_profile',
@@ -139,3 +128,6 @@ class TransporterProfile(models.Model):
                         related_name='trans_profile_veh_type', blank=False)
     load_type = models.ManyToManyField('masters.LoadType', related_name='trans_profile_load_type',
                         blank=False)
+
+    def __str__(self):
+        return '%s' %(self.transporter_id)
