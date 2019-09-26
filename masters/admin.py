@@ -49,8 +49,8 @@ class TransProfileResource(resources.ModelResource):
         # import_id_fields defines the field to be used as id
         import_id_fields = ('trans_profile_id',)
         # When import_id_fields is used, fields need to be explicitly specified
-        fields = ('transproter_id', 'source_id', 'destination_id',  'vehicle_type_id',
-                    'load_type', )
+        fields = ('trans_profile_id', 'transporter_id', 'source_id', 'destination_id',
+                    'vehicle_type_id', 'load_type', )
 
 class TransProfileAdmin(ImportExportModelAdmin):
     resource_class = TransProfileResource

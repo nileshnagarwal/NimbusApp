@@ -21,16 +21,17 @@ def point_in_polygon(lat, lng):
         boundary = all_shapes[i] # get a boundary polygon
         # print('Checking for point ', point, ' in district ', all_records[i][6])
         if Point(point).within(shape(boundary)): # make a point and see if it's in the polygon
-            name = all_records[i][6] # get the sixth field of the corresponding record
-            print('Point ', point, ' found in district ', all_records[i][6])
-            return get_district_id(name) # Get district_id from name and return
-        # print('Point ', point, ' not found in district ', all_records[i][6])
+            district = all_records[i][6] # get the sixth field of the corresponding record
+            state = all_records[i][3]
+            print('Point ', point, ' found in district ', district, ', ', state)
+            return get_district_id(district, state) # Get district_id from name and return
 
-def get_district_id(district):
+
+def get_district_id(district, state):
     """
     Get District Id from District Model using the district name received
     """
-    qs = District.objects.filter(district__exact=district)
+    qs = District.objects.filter(district__exact=district, state__exact=state)
     district_ids = qs.values_list('district_id', flat=True)
     id = None
     print (district_ids)

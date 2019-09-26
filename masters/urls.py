@@ -16,4 +16,6 @@ urlpatterns = [
     url(r'^masters/places/(?P<pk>[0-9]+)/$', views.PlacesDetail.as_view()),
     url(r'^masters/districts/$', views.DistrictList.as_view()),
     url(r'^masters/districts/(?P<pk>[0-9]+)/$', views.DistrictDetail.as_view()),
+    url(r'^masters/trans_profile/$', views.TransporterProfileList.as_view()),
+    url(r'^masters/trans_profile/(?P<pk>[0-9]+)/$', views.TransporterProfileDetail.as_view()),
 ]

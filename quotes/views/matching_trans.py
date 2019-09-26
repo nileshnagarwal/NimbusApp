@@ -5,6 +5,9 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 
+from itertools import chain
+from pprint import pprint
+
 from quotes.models import Enquiry
 from masters.models import Places, TransporterProfile, Transporter
 
@@ -13,7 +16,7 @@ class MatchingTrans(generics.ListAPIView):
     """
     Search for mathching transporters for a given enquiry.
     """
-    def get(self, request, *args, **kwargs):        
+    def get(self, request, *args, **kwargs):
         enquiry_id = request.query_params.get('enquiry_id')
         print('Enquiry id is ', enquiry_id)
         enquiry = Enquiry.objects.get(enquiry_id__exact=enquiry_id)
@@ -47,13 +50,19 @@ class MatchingTrans(generics.ListAPIView):
             filtered_trans_2 = TransporterProfile.objects.none()
         for trans in filtered_trans_2:
             print('Filtered Trans 2',trans.transporter_id)
-        print(filtered_trans_1, filtered_trans_2)
+        print('Filtered Trans 1: ', filtered_trans_1, 'Filtered Trans 2: ', filtered_trans_2)
         filtered_trans = TransporterProfile.objects.none()
         filtered_trans = filtered_trans_1 | filtered_trans_2
-        print(filtered_trans)
+        # filtered_trans = chain(filtered_trans_1, filtered_trans_2)
+        # filtered_trans = filtered_trans_1.union(filtered_trans_2)
+        print('Filtered Trans: ',filtered_trans)
         filtered_trans = filtered_trans.filter(load_type__exact=load_type, \
             vehicle_type_id__in=vehicle_type)
-        filtered_trans_list = filtered_trans.values_list('transporter_id', flat=True)
-        for trans in filtered_trans_list:
-            print(Transporter.objects.get(transporter_id=trans))
+        filtered_trans_list = filtered_trans.values_list('load_type', flat=True)
+        # qs = TransporterProfile.objects.all()
+        # test = qs.values_list('transporter_id', flat=True)
+        # print('Test: ', test)
+        print('filtered_trans_list: ', filtered_trans_list)
+        for trans in filtered_trans:
+            print(trans.transporter_id.transporter_id)
         return Response(None, status.HTTP_200_OK)
