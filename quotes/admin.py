@@ -16,7 +16,8 @@ class EnquiryResource(resources.ModelResource):
         # When import_id_fields is used, fields need to be explicitly specified
         fields = ('enquiry_id', 'status', 'length', 'width', 'height', 'weight',
                     'vehicle_type', 'vehicle_body', 'extra_expenses', 'load_type', 
-                    'comments', 'enquiry_no', 'loading_date', 'created', 'user', )
+                    'load_type_new', 'comments', 'enquiry_no', 'loading_date',
+                    'created', 'user', )
 
 class EnquiryAdmin(ImportExportModelAdmin):
     resource_class = EnquiryResource
