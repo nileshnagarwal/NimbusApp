@@ -76,7 +76,7 @@ class DistrictDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class TransporterProfileList(generics.ListCreateAPIView):
     """Creating List and Post functions for District model"""
-    queryset = TransporterProfile.objects.all().order_by('district_id')
+    queryset = TransporterProfile.objects.all().order_by('trans_profile_id')
     serializer_class = TransporterProfileSerializer
 
 class TransporterProfileDetail(generics.RetrieveUpdateDestroyAPIView):

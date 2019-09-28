@@ -5,7 +5,6 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 
-from itertools import chain
 from pprint import pprint
 
 from quotes.models import Enquiry
@@ -52,13 +51,13 @@ class MatchingTrans(generics.ListAPIView):
             print('Filtered Trans 2',trans.transporter_id)
         print('Filtered Trans 1: ', filtered_trans_1, 'Filtered Trans 2: ', filtered_trans_2)
         filtered_trans = TransporterProfile.objects.none()
-        filtered_trans = filtered_trans_1 | filtered_trans_2
+        # filtered_trans = filtered_trans_1 | filtered_trans_2
         # filtered_trans = chain(filtered_trans_1, filtered_trans_2)
-        # filtered_trans = filtered_trans_1.union(filtered_trans_2)
+        filtered_trans = filtered_trans_1.union(filtered_trans_2)
         print('Filtered Trans: ',filtered_trans)
         filtered_trans = filtered_trans.filter(load_type__exact=load_type, \
             vehicle_type_id__in=vehicle_type)
-        filtered_trans_list = filtered_trans.values_list('load_type', flat=True)
+        filtered_trans_list = filtered_trans.values_list('transporter_id', flat=True).distinct()
         # qs = TransporterProfile.objects.all()
         # test = qs.values_list('transporter_id', flat=True)
         # print('Test: ', test)
