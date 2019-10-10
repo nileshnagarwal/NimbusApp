@@ -2,7 +2,8 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from .models import VehicleType, VehicleBody, LoadType, \
-    Transporter, ExtraExpenses, District, TransporterProfile
+    Transporter, ExtraExpenses, District, TransporterProfile,\
+    Places
 
 class TransporterResource(resources.ModelResource):
     """
@@ -33,7 +34,7 @@ class DistrictResource(resources.ModelResource):
         import_id_fields = ('district_id',)
         # When import_id_fields is used, fields need to be explicitly specified
         fields = ('district_id', 'district', 'lat',  'lng',
-                    'state', )
+                    'state', 'unique_id', 'neighbors', 'neighbors_str', )
 
 class DistrictAdmin(ImportExportModelAdmin):
     resource_class = DistrictResource
@@ -55,6 +56,23 @@ class TransProfileResource(resources.ModelResource):
 class TransProfileAdmin(ImportExportModelAdmin):
     resource_class = TransProfileResource
 
+class PlacesResource(resources.ModelResource):
+    """
+    Refer: https://django-import-export.readthedocs.io/en/latest/
+    getting_started.html#creating-import-export-resource
+    """
+
+    class Meta:
+        model = Places
+        # import_id_fields defines the field to be used as id
+        import_id_fields = ('place_id',)
+        # When import_id_fields is used, fields need to be explicitly specified
+        fields = ('place_id', 'enquiry_id', 'place', 'lat',
+                    'lng', 'place_id_agm', 'src_dest', 'district_id', )
+
+class PlacesAdmin(ImportExportModelAdmin):
+    resource_class = PlacesResource
+
 # Register your models here.
 admin.site.register(VehicleType)
 admin.site.register(VehicleBody)
@@ -63,3 +81,4 @@ admin.site.register(ExtraExpenses)
 admin.site.register(Transporter, TransporterAdmin)
 admin.site.register(District, DistrictAdmin)
 admin.site.register(TransporterProfile, TransProfileAdmin)
+admin.site.register(Places, PlacesAdmin)

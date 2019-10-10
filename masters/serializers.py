@@ -60,9 +60,12 @@ class DistrictSerializer(serializers.ModelSerializer):
     """
     District ModelSerializer.
     """
+    neighbors_str = serializers.StringRelatedField(source='neighbors', many=True, read_only=True)
+
     class Meta:
         model = District
-        fields = '__all__'
+        fields = ('district_id', 'district', 'state', 'lat', \
+            'lng', 'unique_id', 'neighbors', 'neighbors_str', )
 
 class TransporterProfileSerializer(serializers.ModelSerializer):
     """
