@@ -107,6 +107,8 @@ class District(models.Model):
     state = models.CharField(max_length=255, blank=False, null=False)
     lat = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
     lng = models.DecimalField(max_digits=24, decimal_places=20, blank=True, null=True)
+    unique_id = models.CharField(max_length=20, blank=True, null=True)
+    neighbors = models.ManyToManyField("self", blank=True)
 
     def __str__(self):
         return '%s, %s' %(self.district, self.state)
