@@ -4,6 +4,7 @@ used as foreignkeys in other forms.
 """
 
 from django.db import models
+from django.contrib.postgres.fields import JSONField
 
 from webapp.validators import MobileValidation
 
@@ -94,6 +95,11 @@ class Places(models.Model):
                                 blank=False)
     district_id = models.ForeignKey('District', related_name='place',
                                     on_delete=models.PROTECT, blank=True, null=True)
+    address = JSONField(blank=True, null=True)
+    sublocality_level_1 = models.CharField(max_length=255, blank=True, null=True)
+    locality = models.CharField(max_length=255, blank=True, null=True)
+    administrative_area_level_2 = models.CharField(max_length=255, blank=True, null=True)
+    administrative_area_level_1 = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return self.place

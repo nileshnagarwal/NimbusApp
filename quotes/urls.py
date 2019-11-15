@@ -15,4 +15,5 @@ urlpatterns = [
     url(r'^quotes/enquiry/(?P<pk>[0-9]+)/$', views.SupplierQuotesForEnquiry.as_view()),
     url(r'^matching_trans/$', views.MatchingTrans.as_view()),
     url(r'^update_trans_prof/$', views.UpdateTransProfile.as_view()),
+    url(r'^update_places_loc/$', views.UpdatePlacesLocality.as_view()),
 ]
