@@ -14,12 +14,35 @@ class VehicleType(models.Model):
     Defining vehicle types like 40' High Bed 20T, 40' Low Bed 20T
     etc.
     """
+
+    # Defining choices for category field
+    # Category choice fields
+    Trailer = 'Trailer'
+    Truck = 'Truck'
+    Tempo = 'Tempo'
+    OpenTruck = 'Open Truck'
+    ContainerTruck = 'Container Truck'
+    HydraulicTrailer = 'Hydraulic Trailer'
+    Misc = 'Misc'
+    
+    _status_choices = (
+        (Trailer, 'Trailer'),
+        (Truck, 'Truck'),
+        (Tempo, 'Tempo'),
+        (OpenTruck, 'Open Truck'),
+        (ContainerTruck, 'Container Truck'),
+        (HydraulicTrailer, 'Hydraulic Trailer'),
+        (Misc, 'Misc'),
+    )
+
     vehicle_type_id = models.AutoField(primary_key=True)
     vehicle = models.CharField(max_length=30, blank=False, null=False)
     length = models.DecimalField(max_digits=5, decimal_places=2)
     width = models.DecimalField(max_digits=5, decimal_places=2)
     height = models.DecimalField(max_digits=5, decimal_places=2)
     weight = models.DecimalField(max_digits=6, decimal_places=2)
+    category = models.CharField(max_length=30, choices=_status_choices,
+                                default=Misc, blank=False, null=False)
 
     def __str__(self):
         return self.vehicle
