@@ -49,6 +49,7 @@ class EnquiryDetailedSerializer(serializers.ModelSerializer):
     places_return = serializers.SerializerMethodField('get_return', read_only=True)
     places_source_obj = serializers.SerializerMethodField('get_source_obj', read_only=True)
     places_destination_obj = serializers.SerializerMethodField('get_destination_obj', read_only=True)
+    load_size = serializers.SerializerMethodField('get_load_size', read_only=True)
 
     def get_source(self, enquiry):
         return get_source(self, enquiry.enquiry_id)
@@ -74,13 +75,16 @@ class EnquiryDetailedSerializer(serializers.ModelSerializer):
         serializer = PlacesSerializer(instance=qs, many=True)
         places = serializer.data
         return places 
+
+    def get_load_size(self, enquiry):
+        return (f'{enquiry.length:.2f} x {enquiry.width:.2f} x {enquiry.height:.2f}')
         
     class Meta:
         model = Enquiry
         # We define the fields manually to add 'places' to the list of fields as it does not
         # get added automatically being a reverse foreign key field.
         fields = ('enquiry_id', 'status', 'length', 'width', 'height', 'weight',
-                    'vehicle_type', 'vehicle_body', 'extra_expenses', 'load_type',
+                    'vehicle_type', 'vehicle_body', 'extra_expenses', 'load_type', 'load_size',
                     'comments', 'enquiry_no', 'loading_date', 'created', 'places_str', 
                     'places_obj', 'vehicle_type_str', 'vehicle_type_obj', 'vehicle_body_str', 
                     'vehicle_body_obj', 'extra_expenses_str', 'extra_expenses_obj', 'user', 'places_source',
