@@ -4,6 +4,8 @@ Views for the Quotes module.
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.pagination import CursorPagination
+
 from quotes.models import Enquiry, SupplierQuote
 from quotes.serializers import (EnquiryDetailedSerializer, SupplierQuoteSerializer,
                                 EnquirySerializer)
@@ -29,6 +31,7 @@ class EnquiryList(generics.ListCreateAPIView):
     """
     queryset = Enquiry.objects.all().order_by('-created', 'enquiry_no')
     serializer_class = EnquiryDetailedSerializer
+    pagination_class = CursorPagination
 
     # Overriding the post() to handle creating the place
     def post(self, request, *args, **kwargs):
@@ -143,6 +146,7 @@ class EnquirySearchList(generics.ListAPIView):
     """
     
     serializer_class = EnquiryDetailedSerializer
+    pagination_class = CursorPagination
 
     @staticmethod
     def filter_date_status(qs, status, from_date, to_date):

@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import VehicleBody, VehicleType, LoadType, Transporter, \
@@ -6,7 +6,7 @@ from .models import VehicleBody, VehicleType, LoadType, Transporter, \
 from .serializers import VehicleBodySerializer, VehicleTypeSerializer, \
     LoadTypeSerializer, TransporterSerializer, ExtraExpensesSerializer, Places, \
     PlacesSerializer, DistrictSerializer, TransporterProfileSerializer
-
+from .models import VehicleType
 
 # Create your views here.
 class VehicleTypeList(generics.ListCreateAPIView):
@@ -19,6 +19,20 @@ class VehicleTypeDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = VehicleType.objects.all()
     serializer_class = VehicleTypeSerializer
     pagination_class = None
+
+class VehicleTypeCategoryWiseList(generics.ListAPIView):
+    queryset = VehicleType.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        result = []
+        for item in VehicleType._cat_choices:
+            qs = VehicleType.objects.filter(category__exact=item[1])
+            serializer = VehicleTypeSerializer(qs, many=True)
+            result.append({
+                'category': item[1],
+                'types': serializer.data
+                })
+        return Response(result, status.HTTP_200_OK)
 
 class VehicleBodyList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)

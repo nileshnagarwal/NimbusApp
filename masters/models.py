@@ -25,7 +25,7 @@ class VehicleType(models.Model):
     HydraulicTrailer = 'Hydraulic Trailer'
     Misc = 'Misc'
     
-    _status_choices = (
+    _cat_choices = (
         (Trailer, 'Trailer'),
         (Truck, 'Truck'),
         (Tempo, 'Tempo'),
@@ -41,7 +41,7 @@ class VehicleType(models.Model):
     width = models.DecimalField(max_digits=5, decimal_places=2)
     height = models.DecimalField(max_digits=5, decimal_places=2)
     weight = models.DecimalField(max_digits=6, decimal_places=2)
-    category = models.CharField(max_length=30, choices=_status_choices,
+    category = models.CharField(max_length=30, choices=_cat_choices,
                                 default=Misc, blank=False, null=False)
 
     def __str__(self):
