@@ -68,13 +68,32 @@ class PlacesResource(resources.ModelResource):
         import_id_fields = ('place_id',)
         # When import_id_fields is used, fields need to be explicitly specified
         fields = ('place_id', 'enquiry_id', 'place', 'lat',
-                    'lng', 'place_id_agm', 'src_dest', 'district_id', )
+                    'lng', 'place_id_agm', 'src_dest', 'district_id', 
+                    'address', 'sublocality_level_1', 'locality', 
+                    'administrative_area_level_2', 'administrative_area_level_1', )
 
 class PlacesAdmin(ImportExportModelAdmin):
     resource_class = PlacesResource
 
+class VehicleTypeResource(resources.ModelResource):
+    """
+    Refer: https://django-import-export.readthedocs.io/en/latest/
+    getting_started.html#creating-import-export-resource
+    """
+
+    class Meta:
+        model = VehicleType
+        # import_id_fields defines the field to be used as id
+        import_id_fields = ('vehicle_type_id',)
+        # When import_id_fields is used, fields need to be explicitly specified
+        fields = ('vehicle_type_id', 'vehicle', 'length', 'width',
+                    'height', 'weight', 'category', )
+
+class VehicleTypeAdmin(ImportExportModelAdmin):
+    resource_class = VehicleTypeResource
+
 # Register your models here.
-admin.site.register(VehicleType)
+admin.site.register(VehicleType, VehicleTypeAdmin)
 admin.site.register(VehicleBody)
 admin.site.register(LoadType)
 admin.site.register(ExtraExpenses)
