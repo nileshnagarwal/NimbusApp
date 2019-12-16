@@ -9,6 +9,7 @@ from rest_framework.pagination import CursorPagination
 from quotes.models import Enquiry, SupplierQuote
 from quotes.serializers import (EnquiryDetailedSerializer, SupplierQuoteSerializer,
                                 EnquirySerializer)
+from quotes.views.update_trans_profile import UpdateTransProfile
 from masters.serializers import PlacesSerializer
 from masters.models import Places, VehicleType, LoadType
 from fcm_django.models import FCMDevice
@@ -306,6 +307,15 @@ class SupplierQuoteList(generics.ListCreateAPIView):
         # When serializing a list of objects, add many=True
         serializer = SupplierQuoteSerializer(quotes, many=True)
         return Response(serializer.data)
+
+    # Overriding Post method to save transporter profile after
+    # saving the quotation
+    def post(self, request, *args, **kwargs):
+        # Saving the quotation calling super post method
+        response = super().post(request, *args, **kwargs)
+        # Saving transporter profile
+        UpdateTransProfile.update_trans_profile()
+        return Response(response.data, status.HTTP_201_CREATED)
 
 class SupplierQuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     """

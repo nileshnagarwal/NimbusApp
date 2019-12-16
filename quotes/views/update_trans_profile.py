@@ -18,15 +18,20 @@ class UpdateTransProfile(generics.ListAPIView):
     Update TransporterProfile based on the Quotations Received upto now
     """
     def get(self, request, *args, **kwargs):
+        UpdateTransProfile.update_trans_profile()
+        return Response(None, status.HTTP_200_OK)
+
+    @staticmethod
+    def update_trans_profile():
         # Get all quotations
-        quotations = SupplierQuote.objects.all()
+        quotations = SupplierQuote.objects.filter(linked_trans_profiles__isnull=True)
         for quotation in quotations:
             # Get Enquiry Instance for the quotation
             enquiry = quotation.enquiry_id
             # Get Transporter Instance for the quotation
             transporter_id = quotation.transporter_id
             # Create a TransporterProfile Instance and save to the DB
-            trans_profile_ent = TransporterProfile(transporter_id=transporter_id)
+            trans_profile_ent = TransporterProfile(transporter_id=transporter_id, quote_id=quotation)
             trans_profile_ent.save()
             # Get source and dest places queryset from the enquiry
             src_places = enquiry.places.filter(src_dest__exact=Places.Source).\
@@ -65,5 +70,4 @@ class UpdateTransProfile(generics.ListAPIView):
             for vehicle_type in vehicle_type_id:
                 trans_profile_ent.vehicle_type_id.add(vehicle_type)
             trans_profile_ent.load_type.add(load_type)
-        return Response(None, status.HTTP_200_OK)
 

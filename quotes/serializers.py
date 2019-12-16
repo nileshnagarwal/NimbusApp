@@ -3,9 +3,10 @@ Serializers for the Quotes Module
 """
 from rest_framework import serializers
 from masters.serializers import (VehicleBodySerializer, VehicleTypeSerializer,
-    ExtraExpensesSerializer, PlacesSerializer)
+    ExtraExpensesSerializer, PlacesSerializer, TransporterProfileSerializer)
 from quotes.models import Enquiry, SupplierQuote
-from masters.models import Places
+from masters.models import Places, TransporterProfile
+from common.serializers import UserSerializer
 
 # Defining serializers for quotes app
 
@@ -101,12 +102,19 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
     places_source = serializers.SerializerMethodField('get_source', read_only=True)
     places_destination = serializers.SerializerMethodField('get_destination', read_only=True)
     enquiry = EnquirySerializer(source='enquiry_id', read_only=True)
+    linked_trans_profile = serializers.SerializerMethodField('get_linked_trans_profiles', read_only=True)
+    traffic_incharge = UserSerializer(source='user_id', read_only=True)
     
     def get_source(self, quote):
         return get_source(self, quote.enquiry_id)
 
     def get_destination(self, quote):
         return get_destination(self, quote.enquiry_id)
+
+    def get_linked_trans_profiles(self, quote):
+        qs = TransporterProfile.objects.filter(quote_id=quote)
+        serializer = TransporterProfileSerializer(qs, many=True)
+        return serializer.data
     
     class Meta:
         model = SupplierQuote

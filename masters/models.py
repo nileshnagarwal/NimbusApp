@@ -159,6 +159,8 @@ class TransporterProfile(models.Model):
                         related_name='trans_profile_veh_type', blank=False)
     load_type = models.ManyToManyField('masters.LoadType', related_name='trans_profile_load_type',
                         blank=False)
+    quote_id = models.ForeignKey('quotes.SupplierQuote', related_name='linked_trans_profiles', 
+                        on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         return '%s' %(self.transporter_id)
