@@ -62,21 +62,14 @@ class EnquiryList(generics.ListCreateAPIView):
                 source['enquiry_id'] = enquiry.enquiry_id
                 source['src_dest'] = "Source"
                 source['district_id'] = point_in_polygon(source['lat'], source['lng'])
-                print('Source is ', source)
             for destination in destinations:
                 destination['enquiry_id'] = enquiry.enquiry_id
                 destination['src_dest'] = "Destination"
                 destination['district_id'] = point_in_polygon(destination['lat'], destination['lng'])
-                print('Destination is ', destination)
             return_loc['enquiry_id'] = enquiry.enquiry_id
             return_loc['src_dest'] = "Return"
-            # if not (return_loc['lat'] == None or return_loc['lat'].strip() == '' or return_loc['lng'] == None \
-            #     or return_loc['lat'].strip() == ''):
             if not (return_loc['lat'] in [None, ''] or return_loc['lng'] in [None, '']):
-                print(return_loc['lat'])
-                print(return_loc['lng'])
                 return_loc['district_id'] = point_in_polygon(return_loc['lat'], return_loc['lng'])
-                print('Return Location is ', return_loc)
 
             # Finally we save source, destination and return
             # Since we are creating many sources together, we need to add
@@ -380,7 +373,6 @@ def send_enq_notification(enquiry, enquiry_id, sources, destinations):
     load_type = LoadType.objects.get(pk=enquiry['load_type_new'])
     body = source + ' to ' + destination + '. ' + str(load_type) + \
         ' Cargo. Loading on ' + datetime_object.strftime("%d %b, %Y | %a")
-    print(body)
     queryset.send_message(title=title, body=body, data={"enquiry_id": enquiry_id})
 
 def trimPlaceStr(place):
