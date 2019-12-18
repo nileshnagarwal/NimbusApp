@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from masters.models import Places
+
+from webapp.settings import GOOGLE_API_SETTINGS
 # Create your views here
 class UpdatePlacesLocality(generics.ListAPIView):
     """
@@ -16,8 +18,8 @@ class UpdatePlacesLocality(generics.ListAPIView):
         # Get all places having blank address field
         places = Places.objects.filter(address__isnull=True)
         # URL and key of google maps api
-        url = 'https://maps.googleapis.com/maps/api/geocode/json'
-        api_key = 'AIzaSyAdW-L7cDATNI2-G8kph-c8zKuDR8hTdzs'        
+        url = GOOGLE_API_SETTINGS['URL']
+        api_key = GOOGLE_API_SETTINGS['API_KEY']
         
         # Loop through all the places to get address from api and save the same
         for place in places:

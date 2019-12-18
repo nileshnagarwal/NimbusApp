@@ -45,7 +45,13 @@ class UpdateTransProfile(generics.ListAPIView):
             destination_id_arr = [] # Store district ids of destination
             for place in src_places: # Get district of all source places
                 if place.district_id is None:
-                    district_id = point_in_polygon(place.lat, place.lng)
+                    # We need to send locality or admin_area_lvl_2 ie district name
+                    # recvd from google to point_in_polygon method
+                    if place.locality:
+                        location = place.locality
+                    else:
+                        location = place.administrative_area_level_2
+                    district_id = point_in_polygon(place.lat, place.lng, location=location)
                     district = District.objects.get(pk=district_id)
                     place.district_id = district
                     place.save()
@@ -56,7 +62,11 @@ class UpdateTransProfile(generics.ListAPIView):
                     trans_profile_ent.source_id.add(place.district_id)
             for place in dest_places: # Get district of all source places
                 if place.district_id is None:
-                    district_id = point_in_polygon(place.lat, place.lng)
+                    if place.locality:
+                        location = place.locality
+                    else:
+                        location = place.administrative_area_level_2
+                    district_id = point_in_polygon(place.lat, place.lng, location=location)
                     district = District.objects.get(pk=district_id)
                     place.district_id = district
                     place.save()

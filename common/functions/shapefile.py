@@ -1,9 +1,10 @@
 from django.core import exceptions
 import shapefile
-from shapely.geometry import Point # Point class
+from shapely.geometry import Point, Polygon # Point class
 from shapely.geometry import shape # shape() is a function to convert geo objects through the interface
+import requests
 import os
-from webapp.settings import BASE_DIR
+from webapp.settings import BASE_DIR, GOOGLE_API_SETTINGS
 from masters.models import District
 
 from collections import OrderedDict
@@ -12,14 +13,15 @@ import xlrd, xlwt
 from xlwt import Workbook
 
 from masters.models import District
+from operator import itemgetter
 
-def point_in_polygon(lat, lng):
+def point_in_polygon(lat, lng, *args, **kwargs):
     """
     Check if point lies within a polygon from polygons defined in a 
     shapefile.
     """
 
-    point = (lng, lat) # an x,y tuple
+    point = Point(lng, lat) # Point obj created from lng, lat
     # Get path to shapefiles
     shp_path = os.path.join(BASE_DIR, 'shapefiles', 'gadm36_IND_2.shp')
     shp = shapefile.Reader(shp_path) #open the shapefile
@@ -28,11 +30,62 @@ def point_in_polygon(lat, lng):
     for i in range(len(all_shapes)):
         boundary = all_shapes[i] # get a boundary polygon
         # print('Checking for point ', point, ' in district ', all_records[i][6])
-        if Point(point).within(shape(boundary)): # make a point and see if it's in the polygon
+        if point.within(shape(boundary)): # make a point and see if it's in the polygon
             district = all_records[i][6] # get the sixth field of the corresponding record
             state = all_records[i][3]
-            print('Point ', point, ' found in district ', district, ', ', state)
+            # print('Point ', point, ' found in district ', district, ', ', state)
             return get_district_id(district, state) # Get district_id from name and return
+    
+    # If we are unable to find a shapefile containing the point,
+    # The point may be on boundary of country lying outside all our polygons
+    # In this case, get lat, lng of locality or district and get polygon from that
+    lat, lng = get_lat_lng(kwargs['location'])
+    # print('lat, lng')
+    # print(lat, lng)
+    point = Point(lng, lat)
+    for i in range(len(all_shapes)):
+        boundary = all_shapes[i] # get a boundary polygon
+        shape_poly = shape(boundary)
+        if point.within(shape_poly):
+            district = all_records[i][6] # get the sixth field of the corresponding record
+            state = all_records[i][3]
+            # print('Point ', point, ' found in district ', district, ', ', state)
+            return get_district_id(district, state) # Get district_id from name and return
+    
+def get_lat_lng(location):
+    """
+    Get lat lng from google for a given location
+    """
+
+    # print('location: ', location)
+
+    # defining a params dict for the parameters to be sent to the API 
+    params = {'address':location, 'key': GOOGLE_API_SETTINGS['API_KEY']}
+
+    # sending get request and saving the response as response object 
+    r = requests.get(url = GOOGLE_API_SETTINGS['URL'], params = params)
+    
+    # extracting data in json format 
+    data = r.json()
+
+    lat = data['results'][0]['geometry']['location']['lat']
+    lng = data['results'][0]['geometry']['location']['lng']
+    result = (lat, lng, )
+    # print(result)
+    return (result)
+
+    # print(Point(point).distance(shape(all_shapes[1])))
+    # print(type(shape(all_shapes[1])))
+    # distance_tuple = ()
+    # for poly in all_shapes:
+    #     distance = Point(point).distance(shape(poly).centroid)
+    #     distance_tuple = distance_tuple + ((distance, i),)
+    # # print(distance_tuple)
+    # min_distance, i = min(distance_tuple)
+    # # min_distance, district = min(((shape(poly).distance(point), poly) for poly in all_shapes), key=itemgetter(0))
+    # district = all_records[i][6] # get the sixth field of the corresponding record
+    # state = all_records[i][3]
+    # print(min_distance, district)
 
 
 def get_district_id(district, state):

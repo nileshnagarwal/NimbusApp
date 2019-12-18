@@ -61,15 +61,30 @@ class EnquiryList(generics.ListCreateAPIView):
             for source in sources:
                 source['enquiry_id'] = enquiry.enquiry_id
                 source['src_dest'] = "Source"
-                source['district_id'] = point_in_polygon(source['lat'], source['lng'])
+                if source['locality']:
+                        location = source['locality']
+                else:
+                    location = source['administrative_area_level_2']
+                print(location)
+                source['district_id'] = point_in_polygon(source['lat'], source['lng'], location=location)
             for destination in destinations:
                 destination['enquiry_id'] = enquiry.enquiry_id
                 destination['src_dest'] = "Destination"
-                destination['district_id'] = point_in_polygon(destination['lat'], destination['lng'])
+                if destination['locality']:
+                        location = destination['locality']
+                else:
+                    location = destination['administrative_area_level_2']
+                print(location)
+                destination['district_id'] = point_in_polygon(destination['lat'], destination['lng'], location=location)
             return_loc['enquiry_id'] = enquiry.enquiry_id
             return_loc['src_dest'] = "Return"
             if not (return_loc['lat'] in [None, ''] or return_loc['lng'] in [None, '']):
-                return_loc['district_id'] = point_in_polygon(return_loc['lat'], return_loc['lng'])
+                if return_loc['locality']:
+                        location = return_loc['locality']
+                else:
+                    location = return_loc['administrative_area_level_2']
+                print(location)
+                return_loc['district_id'] = point_in_polygon(return_loc['lat'], return_loc['lng'], location=location)
 
             # Finally we save source, destination and return
             # Since we are creating many sources together, we need to add

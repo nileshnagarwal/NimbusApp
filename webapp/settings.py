@@ -182,3 +182,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 FCM_DJANGO_SETTINGS = {
         "FCM_SERVER_KEY": "AAAA1Nux2xE:APA91bFBRJQS0dZijI1llkBEwwmvVoL8iPuP5BOKZjPcoKECGFZd6Sqv3Cq38j2AiKBDESDYHmmVxObn-8IJTxRz6BRcXhVmvqRDMYqC0q0aExtpDab8ENg6IQtnLsMuWHuyWSYfr8Ly",
 }
+
+# Google Maps Api settings
+GOOGLE_API_SETTINGS = {
+    'URL': 'https://maps.googleapis.com/maps/api/geocode/json',
+    'API_KEY': 'AIzaSyAdW-L7cDATNI2-G8kph-c8zKuDR8hTdzs',
+}
