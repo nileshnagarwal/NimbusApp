@@ -4,8 +4,8 @@ Serializers for the Quotes Module
 from rest_framework import serializers
 from masters.serializers import (VehicleBodySerializer, VehicleTypeSerializer,
     ExtraExpensesSerializer, PlacesSerializer, TransporterProfileSerializer)
-from quotes.models import Enquiry, SupplierQuote
-from masters.models import Places, TransporterProfile
+from quotes.models import Enquiry, SupplierQuote, SupplierResponse
+from masters.models import Places, TransporterProfile, LoadType
 from common.serializers import UserSerializer
 
 # Defining serializers for quotes app
@@ -116,6 +116,23 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
         qs = TransporterProfile.objects.filter(quote_id=quote)
         serializer = TransporterProfileSerializer(qs, many=True)
         return serializer.data
+
+    def validate(self, data):
+        """
+        Check if either the freight_incl or freight_excl or freight_normal is provided
+        """
+        # Get enquiry instance
+        enquiry = Enquiry.objects.get(pk=data['enquiry_id'].enquiry_id)
+        # If load_type is ODC, either incl or excl freight must be provided
+        if (enquiry.load_type_new.load_type==LoadType.ODC):
+            if (data['freight_incl_org'] is None and data['freight_excl_org'] is None):
+                raise serializers.ValidationError("For " + LoadType.ODC + " cargo, " + \
+                    "either freight_incl_org or freight_excl_org should be provided.")
+        # Else normal freight must be provided
+        else:
+            if (data['freight_normal_org'] is None):
+                raise serializers.ValidationError("Freight needs to be provided.")
+        return super().validate(data)
     
     class Meta:
         model = SupplierQuote
@@ -134,3 +151,11 @@ def get_destination(self, enquiry_id):
     places = serializer.data
     places_arr = [d['place'] for d in places if 'place' in d]
     return places_arr
+
+class SupplierResponseSerializer(serializers.ModelSerializer):
+    """
+    Model Serializer for Supplier Responses
+    """
+    class Meta:
+        model = SupplierResponse
+        fields = '__all__'

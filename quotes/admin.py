@@ -2,6 +2,7 @@ from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from .models import Enquiry, SupplierQuote
+from quotes.models import SupplierResponse
 
 class EnquiryResource(resources.ModelResource):
     """
@@ -43,3 +44,21 @@ class SupplierQuoteAdmin(ImportExportModelAdmin):
     resource_class = SupplierQuoteResource
 
 admin.site.register(SupplierQuote, SupplierQuoteAdmin)
+
+class SupplierResponseResource(resources.ModelResource):
+    """
+    Refer: https://django-import-export.readthedocs.io/en/latest/
+    getting_started.html#creating-import-export-resource
+    """
+
+    class Meta:
+        model = SupplierResponse
+        # import_id_fields defines the field to be used as id
+        import_id_fields = ('response_id',)
+        # When import_id_fields is used, fields need to be explicitly specified
+        fields = ('response_id', 'enquiry_id', 'transporter_id', 'response', )
+
+class SupplierResponseAdmin(ImportExportModelAdmin):
+    resource_class = SupplierResponseResource
+
+admin.site.register(SupplierResponse, SupplierResponseAdmin)
