@@ -31,12 +31,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fjf7vi$7%mp3ia(e!t(iapr=ggfn6h
 
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
-ALLOWED_HOSTS = [
+ALLOWED_HOSTS = [os.environ['WEBSITE_SITE_NAME'] + '.azurewebsites.net', '127.0.0.1'] if 'WEBSITE_SITE_NAME' in os.environ else [
     'nimbusdjango.herokuapp.com',
     '127.0.0.1',
     'localhost'
 ]
-
 
 # Application definition
 
@@ -93,14 +92,16 @@ WSGI_APPLICATION = 'webapp.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+#   DBNAME, DBUSER etc are azure environment variables defined on azure app settings
+#   Refer https://docs.microsoft.com/en-us/azure/app-service/containers/
+#   tutorial-python-postgresql-app#configure-environment-variables
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': '08011989',
-        'HOST': 'localhost',
-        'PORT': 5432,
+        'NAME': os.environ.get('DBNAME', 'postgres'),
+        'USER': os.environ.get('DBUSER', 'postgres'),
+        'PASSWORD': os.environ.get('DBPASS', '08011989'),
+        'HOST': os.environ.get('DBHOST', 'localhost'),
     }
 }
 
