@@ -331,6 +331,28 @@ class SupplierQuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = SupplierQuote.objects.all()
     serializer_class = SupplierQuoteSerializer
 
+    def patch(self, request, *args, **kwargs):
+        print("Patching")
+        rev_data = request.data.copy
+        print(rev_data)
+        # instance = self.get_object()
+        # # Check for Normal Cargo
+        # print("Load Type is:")
+        # print(instance.enquiry_id.load_type_new)
+        # if (request.data['freight_incl']):
+            
+        # if (instance.enquiry_id.load_type_new==LoadType.Normal):
+        #     if (instance.freight_normal_rev is None):
+        #         rev_data['freight_normal_rev'] = request.data['freight']
+        #     elif (instance.freight_normal_rev > request.data['freight']):
+        #         rev_data['freight_normal_rev'] = request.data['freight']
+        
+        serializer = SupplierQuoteSerializer(self.get_object(),\
+            data=request.data, partial=True)
+        serializer.is_valid()
+        serializer.save()
+        return Response(serializer.data, status.HTTP_202_ACCEPTED)
+
 class SupplierQuotesForEnquiry(generics.ListCreateAPIView):
     """
     Generic EnquiryDetail View
@@ -401,6 +423,18 @@ def trimPlaceStr(place):
         return ((placeArr[0].strip() + ', ' + placeArr[1].strip()))
     else:
         return place.strip()
+
+# def org_or_rev_quote(instance, request, rev_data, freight_type):
+#     """
+#     Check if the freight is to be saved to org or rev.
+#     """
+
+#     if (instance.enquiry_id.load_type_new==LoadType.Normal):
+#         if (instance.freight_normal_rev is None):
+#             rev_data['freight_normal_rev'] = request.data['freight']
+#         elif (instance.freight_normal_rev > request.data['freight']):
+#             rev_data['freight_normal_rev'] = request.data['freight']
+
 
 class SupplierResponseList(generics.ListCreateAPIView):
     """
