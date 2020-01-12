@@ -60,6 +60,18 @@ class LoadType(models.Model):
     """
     Defining load type like ODC, Normal etc.
     """
+    # Load type choice fields. Used in logical expressions.
+    ODC = 'ODC'
+    Normal = 'Normal'
+    Part = 'Part'
+    Container = 'Container'
+    _load_type_choices = (
+        (ODC, 'ODC'),
+        (Normal, 'Normal'),
+        (Part, 'Part'),
+        (Container, 'Container'),
+    )
+
     load_type_id = models.AutoField(primary_key=True)
     load_type = models.CharField(max_length=20, blank=False, null=False)
 

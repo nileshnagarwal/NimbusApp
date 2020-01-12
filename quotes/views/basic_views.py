@@ -6,9 +6,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
 
-from quotes.models import Enquiry, SupplierQuote
-from quotes.serializers import (EnquiryDetailedSerializer, SupplierQuoteSerializer,
-                                EnquirySerializer)
+from quotes.models import Enquiry, SupplierQuote, SupplierResponse
+from quotes.serializers import EnquiryDetailedSerializer, EnquirySerializer, SupplierQuoteSerializer, SupplierResponseSerializer
 from quotes.views.update_trans_profile import UpdateTransProfile
 from masters.serializers import PlacesSerializer
 from masters.models import Places, VehicleType, LoadType
@@ -402,3 +401,17 @@ def trimPlaceStr(place):
         return ((placeArr[0].strip() + ', ' + placeArr[1].strip()))
     else:
         return place.strip()
+
+class SupplierResponseList(generics.ListCreateAPIView):
+    """
+    Generic ListCreateApi View for Supplier Response
+    """
+    queryset = SupplierResponse.objects.all().order_by('-created', 'response_id')
+    serializer_class = SupplierResponseSerializer
+
+class SupplierResponseDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Generic RetrieveUpdateDestroyAPIView View for Supplier Response
+    """
+    queryset = SupplierResponse.objects.all().order_by('-created', 'response_id')
+    serializer_class = SupplierResponseSerializer

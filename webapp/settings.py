@@ -27,9 +27,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fjf7vi$7%mp3ia(e!t(iapr=ggfn6hnrupw+*1jul7zgg#q2c')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'nimbusdjango.herokuapp.com',
@@ -58,7 +56,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -155,9 +152,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-# The absolute path to the directory where collectstatic will collect static files for deployment.
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
@@ -168,15 +162,6 @@ CORS_ORIGIN_WHITELIST = ('localhost:8080', 'localhost:3000', \
 'localhost:4300', '192.168.1.10:5050', 'neeluroadways.in', \
 'nimbuslogistics.in', 'https://www.neeluroadways.in', \
 'https://www.neeluroadways.in/', '')
-
-# Heroku: Update database configuration from $DATABASE_URL.
-import dj_database_url
-db_from_env = dj_database_url.config(conn_max_age=500)
-DATABASES['default'].update(db_from_env)
-
-# Simplified static file serving.
-# https://warehouse.python.org/project/whitenoise/
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # fcm-django settings. Refer: https://github.com/xtrinch/fcm-django
 FCM_DJANGO_SETTINGS = {
