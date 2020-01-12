@@ -29,7 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     'nimbusdjango.herokuapp.com',
     '127.0.0.1',
-    'localhost'
+    'localhost',
+    'nimbusapp-dev.ap-south-1.elasticbeanstalk.com'
 ]
 
 
