@@ -30,7 +30,7 @@ ALLOWED_HOSTS = [
     'nimbusdjango.herokuapp.com',
     '127.0.0.1',
     'localhost',
-    'nimbusapp-dev.ap-south-1.elasticbeanstalk.com'
+    'nimbusapp-prod.ap-south-1.elasticbeanstalk.com'
 ]
 
 
