@@ -31,7 +31,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     'nimbusapp-prod.ap-south-1.elasticbeanstalk.com',
-    'nimbustech.space'
+    'nimbustech.space',
+    'www.nimbustech.space'
 ]
 
 
