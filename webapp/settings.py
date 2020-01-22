@@ -185,3 +185,6 @@ GOOGLE_API_SETTINGS = {
     'URL': 'https://maps.googleapis.com/maps/api/geocode/json',
     'API_KEY': 'AIzaSyAdW-L7cDATNI2-G8kph-c8zKuDR8hTdzs',
 }
+
+# Check for following header to determine if the request is secure
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
