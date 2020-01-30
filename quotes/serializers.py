@@ -124,15 +124,101 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
         # Get enquiry instance
         enquiry = Enquiry.objects.get(pk=data['enquiry_id'].enquiry_id)
         # If load_type is ODC, either incl or excl freight must be provided
+        # Check If load is ODC
         if (enquiry.load_type_new.load_type==LoadType.ODC):
-            if (data['freight_incl_org'] is None and data['freight_excl_org'] is None):
+            # Check if either freight_incl or freight_excl should be provided
+            if (self.initial_data['freight_incl'] is None and self.initial_data['freight_excl'] is None):
                 raise serializers.ValidationError("For " + LoadType.ODC + " cargo, " + \
                     "either freight_incl_org or freight_excl_org should be provided.")
+            # If we are updating an old quote
+            elif (self.instance):
+                # data will be modified by validate_update_freight
+                data = self.validate_update_freight(data)
+            # If we are creating a new quote and either freight_incl or freight_excl
+            # is provided, set data['freight_incl_org'] and data['freight_excl_org']
+            else:
+                if (self.initial_data['freight_incl']):
+                    data['freight_incl_org'] = self.initial_data['freight_incl']
+                if (self.initial_data['freight_excl']):
+                    data['freight_excl_org'] = self.initial_data['freight_excl']
         # Else normal freight must be provided
         else:
-            if (data['freight_normal_org'] is None):
+            # Logic is same as that for ODC. Refer above
+            if (self.initial_data['freight_normal'] is None):
                 raise serializers.ValidationError("Freight needs to be provided.")
+            elif (self.instance):
+                data = self.validate_update_freight(data)
+            else:
+                data['freight_normal_org'] = self.initial_data['freight_normal']
         return super().validate(data)
+
+    def validate_update_freight(self, data):
+        """
+        Check if quote is less than the original quote. Modify the data to 
+        match the field names in backend
+        """
+        # Check if updating an old quote
+        if (self.instance):
+            # Get load_type_str from self
+            load_type_str = self.instance.enquiry_id.load_type_new.load_type
+            # Check If load_type_str is Normal, Container or Part
+            if (load_type_str==LoadType.Normal or load_type_str==LoadType.Container or \
+                load_type_str==LoadType.Part):
+                # Check If freight_normal is provided
+                if (self.initial_data['freight_normal']):
+                    # Set freight_normal_rev to the provided freight_normal
+                    # and make freight_excl and incl None
+                    data['freight_normal_rev'] = self.initial_data['freight_normal']
+                    data['freight_excl'] = None
+                    data['freight_incl'] = None
+                    # Check if user given value is less than the original value.
+                    # If rev quote was saved, check against it, else check against
+                    # the original value
+                    if (self.instance.freight_normal_rev is None):
+                        if (int(self.initial_data['freight_normal'])<self.instance.freight_normal_org):
+                            return data
+                        else: raise serializers.ValidationError("Revised Freight should be less" +\
+                            " than the original Freight.")
+                    elif (int(self.initial_data['freight_normal'])<self.instance.freight_normal_rev):
+                        return data
+                    else: raise serializers.ValidationError("Revised Freight should be less" +\
+                            " than the original Freight.")
+                else:
+                    raise serializers.ValidationError("For Normal Size Cargo, freight_normal should be" +\
+                        " provided")
+            # Similar to Normal
+            elif (load_type_str==LoadType.ODC):
+                if (self.initial_data["freight_excl"] or self.initial_data["freight_incl"]):
+                    if (self.initial_data['freight_excl']):
+                        if(self.instance.freight_excl_rev is None):
+                            if (int(self.initial_data['freight_excl'])<self.instance.freight_excl_org):
+                                data['freight_excl_rev'] = self.initial_data["freight_excl"]
+                                return data
+                            else: raise serializers.ValidationError("Revised Freight should be less" +\
+                                " than the original Freight.")
+                        elif (int(self.initial_data['freight_excl'])<self.instance.freight_excl_rev):
+                            data['freight_excl_rev'] = self.initial_data["freight_excl"]
+                            return data
+                        else: raise serializers.ValidationError("Revised Freight should be less" +\
+                                " than the original Freight.")
+                    if (self.initial_data['freight_incl']):
+                        if(self.instance.freight_incl_rev is None):
+                            if (int(self.initial_data['freight_incl'])<self.instance.freight_incl_org):
+                                data['freight_incl_rev'] = self.initial_data["freight_incl"]
+                                return data
+                            else: raise serializers.ValidationError("Revised Freight should be less" +\
+                                " than the original Freight.")
+                        elif (int(self.initial_data['freight_incl'])<self.instance.freight_incl_rev):
+                            data['freight_incl_rev'] = self.initial_data["freight_incl"]
+                            return data
+                        else: raise serializers.ValidationError("Revised Freight should be less" +\
+                                " than the original Freight.")
+                else: 
+                    raise serializers.ValidationError("For ODC Size Cargo, freight_excl or freight_incl" +\
+                        "  should be provided")
+        else:
+            # If creating a new quote, return the data without changing
+            return data
     
     class Meta:
         model = SupplierQuote
