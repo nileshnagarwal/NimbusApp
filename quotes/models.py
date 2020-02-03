@@ -26,18 +26,7 @@ class Enquiry(models.Model):
         (UnfloatedEnquiry, 'Unfloated Enquiry'),
         (FinalisedOrder, 'Confirmed Order'),
     )
-    # Load type choice fields
-    ODC = 'ODC'
-    Normal = 'Normal'
-    Part = 'Part'
-    Container = 'Container'
-    _load_type_choices = (
-        (ODC, 'ODC'),
-        (Normal, 'Normal'),
-        (Part, 'Part'),
-        (Container, 'Container'),
-    )
-
+    
     # Defining model fields
     enquiry_id = models.AutoField(primary_key=True)
     status = models.CharField(max_length=20, choices=_status_choices,
@@ -53,9 +42,7 @@ class Enquiry(models.Model):
     vehicle_type = models.ManyToManyField('masters.VehicleType', blank=True)
     vehicle_body = models.ManyToManyField('masters.VehicleBody', blank=True)
     extra_expenses = models.ManyToManyField('masters.ExtraExpenses',
-                                            blank=True)
-    load_type = models.CharField(max_length=10, choices=_load_type_choices,
-                                 default=Normal, blank=False)
+                                            blank=True)    
     load_type_new = models.ForeignKey('masters.LoadType', blank=True, 
                                 null=True, on_delete=models.PROTECT)
     comments = models.TextField(blank=True, null=True)

@@ -125,10 +125,10 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
         enquiry = Enquiry.objects.get(pk=data['enquiry_id'].enquiry_id)
         # If load_type is ODC, either incl or excl freight must be provided
         # Check If load is ODC
-        if (enquiry.load_type_new.load_type==LoadType.ODC):
+        if (enquiry.load_type_new.load_type==LoadType.ODC or enquiry.load_type_new.load_type==LoadType.OdcContainer):
             # Check if either freight_incl or freight_excl should be provided
             if (self.initial_data['freight_incl'] is None and self.initial_data['freight_excl'] is None):
-                raise serializers.ValidationError("For " + LoadType.ODC + " cargo, " + \
+                raise serializers.ValidationError("For ODC cargo, " + \
                     "either freight_incl_org or freight_excl_org should be provided.")
             # If we are updating an old quote
             elif (self.instance):
@@ -187,7 +187,7 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError("For Normal Size Cargo, freight_normal should be" +\
                         " provided")
             # Similar to Normal
-            elif (load_type_str==LoadType.ODC):
+            elif (load_type_str==LoadType.ODC or load_type_str==LoadType.OdcContainer):
                 if (self.initial_data["freight_excl"] or self.initial_data["freight_incl"]):
                     if (self.initial_data['freight_excl']):
                         if(self.instance.freight_excl_rev is None):

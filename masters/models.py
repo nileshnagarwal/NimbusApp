@@ -65,11 +65,12 @@ class LoadType(models.Model):
     Normal = 'Normal'
     Part = 'Part'
     Container = 'Container'
+    OdcContainer = 'ODC Container'
     _load_type_choices = (
         (ODC, 'ODC'),
         (Normal, 'Normal'),
         (Part, 'Part'),
-        (Container, 'Container'),
+        (OdcContainer, 'ODC Container'),
     )
 
     load_type_id = models.AutoField(primary_key=True)
