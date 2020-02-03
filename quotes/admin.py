@@ -38,7 +38,9 @@ class SupplierQuoteResource(resources.ModelResource):
         # When import_id_fields is used, fields need to be explicitly specified
         fields = ('quote_id', 'enquiry_id', 'transporter_id', 'freight', 'including_fine',
                     'vehicle_avail', 'vehicle_type_id', 'vehicle_body_id', 'user_id',
-                    'comments', 'created', 'transporter_id__transporter', )
+                    'comments', 'created', 'transporter_id__transporter', 'freight_incl_org',
+                    'freight_excl_org', 'freight_normal_org', 'freight_incl_rev',
+                    'freight_excl_rev', 'freight_normal_rev')
 
 class SupplierQuoteAdmin(ImportExportModelAdmin):
     resource_class = SupplierQuoteResource
