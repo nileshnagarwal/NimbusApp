@@ -73,8 +73,19 @@ class LoadType(models.Model):
         (OdcContainer, 'ODC Container'),
     )
 
+    odc = 'ODC'
+    ftl = 'FTL'
+    ltl = 'LTL'
+    _load_size_choices = (
+        (odc, 'ODC'),
+        (ftl, 'FTL'),
+        (ltl, 'LTL'),
+    )
+
     load_type_id = models.AutoField(primary_key=True)
     load_type = models.CharField(max_length=20, blank=False, null=False)
+    load_size = models.CharField(max_length=20, choices=_load_size_choices,
+                                    blank=True, null=True)
 
     def __str__(self):
         return self.load_type
