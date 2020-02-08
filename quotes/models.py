@@ -86,14 +86,14 @@ class SupplierQuote(models.Model):
                                 on_delete=models.PROTECT)
     transporter_id = models.ForeignKey('masters.Transporter', blank=False,
                                     null=True, on_delete=models.PROTECT)
-    freight = models.PositiveIntegerField(blank=False, null=False)
+    freight = models.PositiveIntegerField(blank=True, null=True)
     freight_incl_rev = models.PositiveIntegerField(blank=True, null=True)
     freight_excl_rev = models.PositiveIntegerField(blank=True, null=True)
     freight_normal_rev = models.PositiveIntegerField(blank=True, null=True)
     freight_incl_org = models.PositiveIntegerField(blank=True, null=True)
     freight_excl_org = models.PositiveIntegerField(blank=True, null=True)
     freight_normal_org = models.PositiveIntegerField(blank=True, null=True)
-    including_fine = models.CharField(max_length=20)
+    including_fine = models.CharField(max_length=20, null=True, blank=True)
     vehicle_avail = models.CharField(max_length=20)
     vehicle_status = models.CharField(choices=_vehicle_status_choices, max_length=20, 
                                         null=True, blank=True)
