@@ -19,4 +19,8 @@ urlpatterns = [
     url(r'^masters/districts/(?P<pk>[0-9]+)/$', views.DistrictDetail.as_view()),
     url(r'^masters/trans_profile/$', views.TransporterProfileList.as_view()),
     url(r'^masters/trans_profile/(?P<pk>[0-9]+)/$', views.TransporterProfileDetail.as_view()),
+    url(r'^masters/client/$', views.ClientList.as_view()),
+    url(r'^masters/client/(?P<pk>[0-9]+)/$', views.ClientDetail.as_view()),
+    url(r'^masters/client_adr/$', views.ClientAddressList.as_view()),
+    url(r'^masters/client_adr/(?P<pk>[0-9]+)/$', views.ClientAddressDetail.as_view()),
 ]

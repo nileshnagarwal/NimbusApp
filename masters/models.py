@@ -188,3 +188,28 @@ class TransporterProfile(models.Model):
 
     def __str__(self):
         return '%s' %(self.transporter_id)
+
+class Client(models.Model):
+    """
+    Client Details Model
+    """
+
+    client_id = models.AutoField(primary_key=True)
+    client = models.CharField(max_length=255, blank=False, null=False)
+
+    def __str__(self):
+        return self.client
+
+class ClientAddress(models.Model):
+    """
+    A model to store various client addresses with respective GSTIN
+    """
+
+    client_address_id = models.AutoField(primary_key=True)
+    address = models.CharField(max_length=255, null=False, blank=False)
+    gstin = models.CharField(max_length=15, null=True, blank=True)
+    client_id = models.ForeignKey('Client', on_delete=models.PROTECT,
+            blank=False, null=False)
+    
+    def __str__(self):
+        return "Details of %s" %(self.client_id)

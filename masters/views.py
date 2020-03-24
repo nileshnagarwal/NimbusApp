@@ -2,11 +2,11 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import VehicleBody, VehicleType, LoadType, Transporter, \
-    ExtraExpenses, District, TransporterProfile
+    ExtraExpenses, District, TransporterProfile, Client, ClientAddress
 from .serializers import VehicleBodySerializer, VehicleTypeSerializer, \
     LoadTypeSerializer, TransporterSerializer, ExtraExpensesSerializer, Places, \
-    PlacesSerializer, DistrictSerializer, TransporterProfileSerializer
-from .models import VehicleType
+    PlacesSerializer, DistrictSerializer, TransporterProfileSerializer, \
+    ClientSerializer, ClientAddressSerializer
 
 # Create your views here.
 class VehicleTypeList(generics.ListCreateAPIView):
@@ -110,4 +110,28 @@ class TransporterProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     """Creating RUD functions for District model"""
     queryset = TransporterProfile.objects.all()
     serializer_class = TransporterProfileSerializer
+    pagination_class = None
+
+class ClientList(generics.ListCreateAPIView):
+    """Creating List and Post functions for Client model"""
+    queryset = Client.objects.all().order_by('client_id')
+    serializer_class = ClientSerializer
+    pagination_class = None
+
+class ClientDetail(generics.RetrieveUpdateDestroyAPIView):
+    """Creating RUD functions for Client model"""
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+    pagination_class = None
+
+class ClientAddressList(generics.ListCreateAPIView):
+    """Creating List and Post functions for ClientAddress model"""
+    queryset = ClientAddress.objects.all().order_by('client_address_id')
+    serializer_class = ClientAddressSerializer
+    pagination_class = None
+
+class ClientAddressDetail(generics.RetrieveUpdateDestroyAPIView):
+    """Creating RUD functions for ClientAddress model"""
+    queryset = ClientAddress.objects.all()
+    serializer_class = ClientAddressSerializer
     pagination_class = None

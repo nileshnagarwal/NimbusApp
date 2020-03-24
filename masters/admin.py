@@ -3,7 +3,7 @@ from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from .models import VehicleType, VehicleBody, LoadType, \
     Transporter, ExtraExpenses, District, TransporterProfile,\
-    Places
+    Places, Client, ClientAddress
 
 class TransporterResource(resources.ModelResource):
     """
@@ -101,3 +101,5 @@ admin.site.register(Transporter, TransporterAdmin)
 admin.site.register(District, DistrictAdmin)
 admin.site.register(TransporterProfile, TransProfileAdmin)
 admin.site.register(Places, PlacesAdmin)
+admin.site.register(Client)
+admin.site.register(ClientAddress)

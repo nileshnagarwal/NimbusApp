@@ -31,6 +31,7 @@ router.register(r'devices', FCMDeviceAuthorizedViewSet)
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('quotes.urls')),
+    url(r'^', include('operations.urls')),
     url(r'^', include('masters.urls')),
     url(r'^', include('common.urls')),
     url(r'^api/token/$', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
