@@ -121,6 +121,30 @@ class LorryReceiptVerify(generics.ListAPIView):
             return Response("The verification and lr_no combination does not " \
                 "match", status.HTTP_400_BAD_REQUEST)
 
+class LorryReceiptNoUniqueCheck(generics.CreateAPIView):
+    """
+    Check if the given LR No is unique
+    """
+    permission_classes = (IsAuthenticated, )
+    queryset = LorryReceiptNo.objects.all().order_by('lr_no')
+    serializer_class = LorryReceiptNoSerializer
+
+    def post(self, request, *arg, **kwargs):
+        data_copy = request.data.copy()
+        lr_no = data_copy.get('lr_no', None)
+        try:
+            lr_no = json.loads(lr_no)
+        except ValueError:
+            return Response("LR No needs to be an integer", \
+                status.HTTP_400_BAD_REQUEST)
+        if (lr_no is None or lr_no is ''):
+            return Response("LR No needs to be provided", \
+                status.HTTP_400_BAD_REQUEST)
+        if (LorryReceiptNo.objects.filter(pk=lr_no).count()==0):
+            return Response(True,status.HTTP_200_OK)
+        else:
+            return Response(False, status.HTTP_200_OK)
+
 class LorryReceiptDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = LorryReceipt.objects.all().order_by('lr_no_id')

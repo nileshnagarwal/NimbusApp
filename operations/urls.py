@@ -13,4 +13,5 @@ urlpatterns = [
     url(r'^operations/item/$', views.ItemList.as_view()),
     url(r'^operations/item/$', views.ItemDetail.as_view()),
     url(r'^operations/lr_verify/$', views.LorryReceiptVerify.as_view()),
+    url(r'^operations/lr_unique_check/$', views.LorryReceiptNoUniqueCheck.as_view()),
 ]
