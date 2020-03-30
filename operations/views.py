@@ -81,7 +81,7 @@ class LorryReceiptList(generics.ListCreateAPIView):
                 return Response("Unknown Error Occured while saving items", \
                     status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class LorryReceiptVerify(generics.ListAPIView):
+class LorryReceiptVerify(generics.CreateAPIView):
     """
     Check if the LR No and verification code combination matched with our
     database and return the LR detailed page if matches.
