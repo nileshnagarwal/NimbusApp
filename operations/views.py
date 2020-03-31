@@ -132,11 +132,19 @@ class LorryReceiptNoUniqueCheck(generics.CreateAPIView):
     def post(self, request, *arg, **kwargs):
         data_copy = request.data.copy()
         lr_no = data_copy.get('lr_no', None)
-        try:
-            lr_no = json.loads(lr_no)
-        except ValueError:
-            return Response("LR No needs to be an integer", \
-                status.HTTP_400_BAD_REQUEST)
+        """
+        If JSON data is sent to api then we get Dict datatype in request.data.
+        Else if form-data is sent to api we get QueryDict datatype.
+        For QueryDict we need to convert the lr_no from str to int. 
+        In case of Dict the lr_no will already be int so this step will be 
+        skipped.
+        """
+        if (type(lr_no) is str):
+            try:
+                lr_no = int(lr_no)
+            except ValueError:
+                return Response("LR No needs to be an integer", \
+                    status.HTTP_400_BAD_REQUEST)
         if (lr_no is None or lr_no is ''):
             return Response("LR No needs to be provided", \
                 status.HTTP_400_BAD_REQUEST)
