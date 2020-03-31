@@ -14,4 +14,5 @@ urlpatterns = [
     url(r'^operations/item/$', views.ItemDetail.as_view()),
     url(r'^operations/lr_verify/$', views.LorryReceiptVerify.as_view()),
     url(r'^operations/lr_unique_check/$', views.LorryReceiptNoUniqueCheck.as_view()),
+    url(r'^operations/lr_search_empty/$', views.OldestEmptyLorryReceiptNo.as_view()),
 ]

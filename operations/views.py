@@ -145,6 +145,40 @@ class LorryReceiptNoUniqueCheck(generics.CreateAPIView):
         else:
             return Response(False, status.HTTP_200_OK)
 
+class OldestEmptyLorryReceiptNo(generics.ListAPIView):
+    """
+    Retrieve the oldest LR No that has not yet been engaged
+    """
+    permission_classes = (IsAuthenticated, )
+    queryset = LorryReceiptNo.objects.all().order_by('lr_no')
+    serializer_class = LorryReceiptNoSerializer
+
+    def get(self, request, *args, **kwargs):
+        # Get lr_no if provided
+        data_copy = request.data.copy()        
+        lr_no = data_copy.get('lr_no', None)
+        """
+        If JSON data is sent to api then we get Dict datatype in request.data.
+        Else if form-data is sent to api we get QueryDict datatype.
+        For QueryDict we need to convert the lr_no from str to int. 
+        In case of Dict the lr_no will already be int so this step will be 
+        skipped.
+        """
+        if (type(lr_no) is str):
+            try:
+                lr_no = int(lr_no)
+            # if lr_no is not int, return error
+            except ValueError:
+                return Response("LR No needs to be an integer", \
+                status.HTTP_400_BAD_REQUEST)
+        # If lr_no is not provided, consider it to be 1
+        if (lr_no is None or lr_no==0):
+            lr_no = 1        
+        # Search for empty lr_no
+        lr_no = empty_lr_search(lr_no)
+        return Response(lr_no, status.HTTP_200_OK)
+        
+
 class LorryReceiptDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = LorryReceipt.objects.all().order_by('lr_no_id')
@@ -162,3 +196,23 @@ class ItemDetail(generics.RetrieveUpdateDestroyAPIView):
 
 def id_generator(size=6, chars=string.ascii_uppercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
+
+def lr_unique_check(lr_no):
+    if (LorryReceiptNo.objects.filter(pk=lr_no).count()==0):
+        return True
+    else:
+        return False
+
+def empty_lr_search(lr_no=1):
+    """
+    Find the oldest LR no which has not been engaged yet.
+    We take the starting lr_no as argument to begin searching from.
+    """
+    
+    not_found = True
+    while not_found:
+        if (LorryReceiptNo.objects.filter(pk=lr_no).count() == 0):
+            not_found = False
+            return lr_no
+        else:
+            lr_no += 1
