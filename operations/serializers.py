@@ -4,14 +4,17 @@ Serializers for Operations Module
 
 from rest_framework import serializers
 from .models import LorryReceipt, LorryReceiptNo, Item
+from masters.serializers import ClientSerializer
 
 class LorryReceiptNoSerializer(serializers.ModelSerializer):
     """
     Model Serializer for LorryReceiptNo Model
     """
+    client = ClientSerializer(source='client_id', read_only=True)
+
     class Meta:
         model = LorryReceiptNo
-        fields = '__all__'
+        fields = ('lr_no', 'client_id', 'vehicle_no', 'client')
 
 class LorryReceiptSerializer(serializers.ModelSerializer):
     """
