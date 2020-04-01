@@ -130,6 +130,16 @@ class ClientAddressList(generics.ListCreateAPIView):
     serializer_class = ClientAddressSerializer
     pagination_class = None
 
+class ClientAddressListByClientId(generics.ListAPIView):
+    """List client addresses for the client id received in query param"""
+    serializer_class = ClientAddressSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        client_id = self.request.query_params.get('client_id')
+        print(client_id)
+        return ClientAddress.objects.filter(client_id__exact=client_id)
+
 class ClientAddressDetail(generics.RetrieveUpdateDestroyAPIView):
     """Creating RUD functions for ClientAddress model"""
     queryset = ClientAddress.objects.all()

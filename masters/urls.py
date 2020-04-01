@@ -22,5 +22,6 @@ urlpatterns = [
     url(r'^masters/client/$', views.ClientList.as_view()),
     url(r'^masters/client/(?P<pk>[0-9]+)/$', views.ClientDetail.as_view()),
     url(r'^masters/client_adr/$', views.ClientAddressList.as_view()),
+    url(r'^masters/client_adr_by_client_id/$', views.ClientAddressListByClientId.as_view()),
     url(r'^masters/client_adr/(?P<pk>[0-9]+)/$', views.ClientAddressDetail.as_view()),
 ]
