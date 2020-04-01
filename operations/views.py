@@ -19,6 +19,7 @@ class LorryReceiptNoList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = LorryReceiptNo.objects.all().order_by('lr_no')
     serializer_class = LorryReceiptNoSerializer
+    pagination_class = None
 
     # Overriding post method to generate verification code
     def post(self, request, *args, **kwargs):
