@@ -37,6 +37,8 @@ class LorryReceipt(models.Model):
                 null=True, blank=True, related_name='lr_consignee')
     consignor_manual = models.CharField(max_length=255, blank=True, null=True)
     consignee_manual = models.CharField(max_length=255, blank=True, null=True)
+    consignor_gstin = models.CharField(max_length=255, blank=True, null=True)
+    consignee_gstin = models.CharField(max_length=255, blank=True, null=True)
     invoice_no = models.CharField(max_length=255, blank=True, null=True)
     invoice_date = models.CharField(max_length=255, blank=True, null=True)
     dc_no = models.CharField(max_length=255, blank=True, null=True)
