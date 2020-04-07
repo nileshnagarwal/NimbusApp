@@ -23,15 +23,20 @@ class LorryReceiptNoList(generics.ListCreateAPIView):
 
     # Overriding post method to generate verification code
     def post(self, request, *args, **kwargs):
+        print("1")
         # Generate the verification code and check for uniqueness
         while True:
+            print("2")
             verification_no = id_generator()
             if (LorryReceiptNo.objects.filter(verification_no__exact=verification_no)\
                 .count() == 0):
+                print(verification_no)
                 break
         # Modify request data to store verification_no
+        print("3")
         data_copy = request.data.copy()
         data_copy['verification_no'] = verification_no
+        print(data_copy)
         serializer = LorryReceiptNoSerializer(data=data_copy)
         if serializer.is_valid():
             serializer.save()

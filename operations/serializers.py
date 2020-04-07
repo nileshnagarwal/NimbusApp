@@ -14,7 +14,7 @@ class LorryReceiptNoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = LorryReceiptNo
-        fields = ('lr_no', 'client_id', 'vehicle_no', 'client')
+        fields = '__all__'
 
 class LorryReceiptSerializer(serializers.ModelSerializer):
     """
