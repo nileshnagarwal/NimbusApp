@@ -37,7 +37,7 @@ class LorryReceiptNoList(generics.ListCreateAPIView):
             serializer.save()
             return Response(serializer.data, status.HTTP_201_CREATED)
         else:
-            return Response(serializer.error_messages, status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
 class LorryReceiptNoDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
@@ -55,14 +55,18 @@ class LorryReceiptList(generics.ListCreateAPIView):
         """
         # Get item list seperated from request data
         try:
-            data_copy = request.data.copy
+            data_copy = request.data.copy()
+            data_copy['user_id'] = request.user.id
             items = request.data.get("items")
-            items = json.loads(items)
+            # If items datatype is str, convert to list
+            if(type(items)==str):
+                items = json.loads(items)
         except (ObjectDoesNotExist, KeyError):
+            # If items not provided, return error
             return Response("Item list not provided", status.HTTP_400_BAD_REQUEST)
-        lr_ser = LorryReceiptSerializer(data=request.data)
+        lr_ser = LorryReceiptSerializer(data=data_copy)
         if not lr_ser.is_valid():
-            return Response(lr_ser.error_messages, status.HTTP_400_BAD_REQUEST)
+            return Response(lr_ser.errors, status.HTTP_400_BAD_REQUEST)
         else:
             lr = lr_ser.save()
             # Add lr_no to items
@@ -72,13 +76,15 @@ class LorryReceiptList(generics.ListCreateAPIView):
                 # Save items and check validity
                 items_ser = ItemSerializer(data=items, many=True)
                 if not items_ser.is_valid():
-                    return Response(items_ser.error_messages, status.HTTP_400_BAD_REQUEST)
+                    # If error occurs while saving items raise error and delete lr
+                    lr.delete()
+                    return Response(items_ser.errors, status.HTTP_400_BAD_REQUEST)
                 else:
                     items_ser.save()
                     return Response(lr_ser.data, status.HTTP_201_CREATED)
             # If error occurs while saving items raise error and delete lr
             except:
-                LorryReceipt.objects.get(pk=lr.lr_no_id).delete()
+                lr.delete()
                 return Response("Unknown Error Occured while saving items", \
                     status.HTTP_500_INTERNAL_SERVER_ERROR)
 
@@ -94,7 +100,6 @@ class LorryReceiptVerify(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         # Get LR No and verification code from request
         try:
-            print(request.data)
             lr_no = request.data.get('lr_no', None)
             verification_no = request.data.get('verification_no', None)
             if (lr_no is None or verification_no is None):

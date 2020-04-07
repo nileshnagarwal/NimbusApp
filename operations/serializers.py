@@ -24,6 +24,15 @@ class LorryReceiptSerializer(serializers.ModelSerializer):
         model = LorryReceipt
         fields = '__all__'
 
+    # to_internal_value converts the value to avoid validation error
+    # Without this we get error saying weight should be an integer
+    # despite having null=True and default=0
+    def to_internal_value(self, data):
+        if data.get('weight') == '':
+            data['weight'] = 0
+        
+        return super(LorryReceiptSerializer, self).to_internal_value(data)
+
 class ItemSerializer(serializers.ModelSerializer):
     """
     Model Serializer for Item Model

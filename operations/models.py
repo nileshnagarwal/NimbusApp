@@ -5,6 +5,10 @@ required for operations like challan, lr, invoice etc.
 
 from django.db import models
 from datetime import date
+from django.contrib.auth import get_user_model
+
+def get_sentinel_user():
+    return get_user_model().objects.get_or_create(email='deleted@nimbuslogistics.in')[0]
 
 class LorryReceiptNo(models.Model):
     """
@@ -17,6 +21,10 @@ class LorryReceiptNo(models.Model):
     client_id = models.ForeignKey('masters.Client', null=False, 
                                 blank=False, on_delete=models.PROTECT)
     vehicle_no = models.CharField(max_length=12, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    user_id = models.ForeignKey(get_user_model(), blank=True,null=True, 
+                            on_delete=models.SET(get_sentinel_user))
 
     def __str__(self):
         return "LR No: %s" %(str(self.lr_no))
@@ -28,7 +36,8 @@ class LorryReceipt(models.Model):
 
     lr_no_id = models.OneToOneField('LorryReceiptNo', on_delete=models.PROTECT, null=False,
             blank=False, primary_key=True)
-    date = models.DateField(default=date.today, null=False, blank=False)
+    date = models.DateTimeField(null=False, blank=False)
+    vehicle_no = models.CharField(max_length=12, blank=False, null=False)
     dispatch_from = models.CharField(max_length=255, blank=False, null=False)
     ship_to = models.CharField(max_length=255, blank=False, null=False)
     consignor_id = models.ForeignKey('masters.ClientAddress', 
@@ -46,10 +55,15 @@ class LorryReceipt(models.Model):
     boe_no = models.CharField(max_length=255, blank=True, null=True)
     boe_date = models.CharField(max_length=255, blank=True, null=True)
     value = models.CharField(max_length=255, blank=False, null=False)
-    ewaybill_no = models.CharField(max_length=255, blank=False, null=False)
+    ewaybill_no = models.CharField(max_length=255, blank=True, null=True)
     comment = models.CharField(max_length=255, blank=True, null=True)
     size = models.CharField(max_length=255, blank=True, null=True)
-    weight = models.IntegerField(blank=True, null=True)
+    weight = models.IntegerField(default=0, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
+    user_id = models.ForeignKey(get_user_model(), blank=True,null=True, 
+                            on_delete=models.SET(get_sentinel_user))
+
 
     def __str__(self):
         return "Detailed %s" %(str(self.lr_no_id))
@@ -61,10 +75,10 @@ class Item(models.Model):
 
     item_id = models.AutoField(primary_key=True)
     packing_type = models.CharField(max_length=255, null=True, blank=True)
-    no_of_pkg = models.IntegerField(null=True, blank=True)
-    description = models.CharField(max_length=255, null=True, blank=True)
+    no_of_pkg = models.CharField(max_length=255, null=True, blank=True)
+    description = models.CharField(max_length=255, null=False, blank=False)
     lr_no_id = models.ForeignKey('LorryReceipt', on_delete=models.PROTECT, 
             blank=False, null=False, related_name='item')
 
     def __str__(self):
-        return "Item for %s" %(str(self.lr_no.lr_no_id))
+        return "Item for %s" %(str(self.lr_no_id.lr_no_id))
