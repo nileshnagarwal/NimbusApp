@@ -87,6 +87,8 @@ class ClientAddressSerializer(serializers.ModelSerializer):
     """
     ClientAddress ModelSerializer.
     """
+    client = ClientSerializer(source='client_id', read_only=True)
+    
     class Meta:
         model = ClientAddress
         fields = '__all__'

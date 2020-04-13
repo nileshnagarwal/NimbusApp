@@ -12,7 +12,7 @@ import json
 
 from .models import LorryReceipt, LorryReceiptNo, Item
 from .serializers import LorryReceiptNoSerializer, \
-    LorryReceiptSerializer, ItemSerializer
+    LorryReceiptSerializer, ItemSerializer, LorryVerifySerializer
 
 
 class LorryReceiptNoList(generics.ListCreateAPIView):
@@ -23,20 +23,16 @@ class LorryReceiptNoList(generics.ListCreateAPIView):
 
     # Overriding post method to generate verification code
     def post(self, request, *args, **kwargs):
-        print("1")
         # Generate the verification code and check for uniqueness
         while True:
-            print("2")
             verification_no = id_generator()
             if (LorryReceiptNo.objects.filter(verification_no__exact=verification_no)\
                 .count() == 0):
-                print(verification_no)
                 break
-        # Modify request data to store verification_no
-        print("3")
+        # Modify request data to store verification_no and user_id
         data_copy = request.data.copy()
         data_copy['verification_no'] = verification_no
-        print(data_copy)
+        data_copy['user_id'] = request.user.id
         serializer = LorryReceiptNoSerializer(data=data_copy)
         if serializer.is_valid():
             serializer.save()
@@ -53,6 +49,7 @@ class LorryReceiptList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = LorryReceipt.objects.all().order_by('lr_no_id')
     serializer_class = LorryReceiptSerializer
+    pagination_class = None
 
     def post(self, request, *args, **kwargs):
         """
@@ -98,9 +95,8 @@ class LorryReceiptVerify(generics.CreateAPIView):
     Check if the LR No and verification code combination matched with our
     database and return the LR detailed page if matches.
     """
-    permission_classes = (IsAuthenticated,)
     queryset = LorryReceipt.objects.all().order_by('lr_no_id')
-    serializer_class = LorryReceiptSerializer
+    serializer_class = LorryVerifySerializer
     
     def post(self, request, *args, **kwargs):
         # Get LR No and verification code from request
@@ -116,7 +112,8 @@ class LorryReceiptVerify(generics.CreateAPIView):
         try:
             lr = LorryReceiptNo.objects.get(pk=lr_no)
         except (ObjectDoesNotExist, KeyError):
-            return Response("No LR has been allocated with the given LR No")
+            return Response("The verification and lr_no combination does not " \
+                "match", status.HTTP_400_BAD_REQUEST)
         # Match the verification no received with the verification no saved
         # in our database
         if (verification_no==lr.verification_no):
@@ -126,7 +123,7 @@ class LorryReceiptVerify(generics.CreateAPIView):
             except (ObjectDoesNotExist, KeyError):
                 return Response("LR No is generated but LR details not filled yet.",\
                     status.HTTP_200_OK)            
-            lr_ser = LorryReceiptSerializer(instance=lr_details)
+            lr_ser = LorryVerifySerializer(instance=lr_details)
             return Response(lr_ser.data, status.HTTP_200_OK)
         else:
             return Response("The verification and lr_no combination does not " \
