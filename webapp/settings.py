@@ -169,7 +169,7 @@ CORS_ORIGIN_WHITELIST = ('localhost:8080', 'localhost:3000', \
 
 # fcm-django settings. Refer: https://github.com/xtrinch/fcm-django
 FCM_DJANGO_SETTINGS = {
-        "FCM_SERVER_KEY": "AAAA1Nux2xE:APA91bFBRJQS0dZijI1llkBEwwmvVoL8iPuP5BOKZjPcoKECGFZd6Sqv3Cq38j2AiKBDESDYHmmVxObn-8IJTxRz6BRcXhVmvqRDMYqC0q0aExtpDab8ENg6IQtnLsMuWHuyWSYfr8Ly",
+        "FCM_SERVER_KEY": "AAAAhpNC87c:APA91bE62qjJS1Sx7FqtpZ-RsdaL450zPXw0On0RVejTOmsV4-MlcVvpSPDJ1xVJx8utL8khkZXxGOA8GHbPs7EWwu_RKrNcQ0bOrR5sdYl3HTR2Bf6olktS2kRexxtxLB5pUquk9IhX",
 }
 
 # Google Maps Api settings
