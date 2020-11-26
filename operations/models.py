@@ -35,7 +35,7 @@ class LorryReceipt(models.Model):
     """
 
     lr_no_id = models.OneToOneField('LorryReceiptNo', on_delete=models.PROTECT, null=False,
-            blank=False, primary_key=True)
+            blank=False, primary_key=True, related_name='lr_details')
     date = models.DateTimeField(null=False, blank=False)
     vehicle_no = models.CharField(max_length=12, blank=False, null=False)
     dispatch_from = models.CharField(max_length=255, blank=False, null=False)

@@ -40,6 +40,15 @@ class LorryReceiptNoList(generics.ListCreateAPIView):
         else:
             return Response(serializer.errors, status.HTTP_400_BAD_REQUEST)
 
+    def get(self, request, *args, **kwargs):
+        # Get only the LR Nos for which LR has not been generated yet
+        lr_nos = LorryReceiptNo.objects.filter(lr_details__isnull=True)
+        serializer = LorryReceiptNoSerializer(lr_nos, many=True)
+        if len(serializer.data)>0:
+            return Response(serializer.data, status.HTTP_200_OK)
+        else:
+            return Response(None, status.HTTP_204_NO_CONTENT)
+        
 class LorryReceiptNoDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = LorryReceiptNo.objects.all().order_by('lr_no')
