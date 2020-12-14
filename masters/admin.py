@@ -1,9 +1,12 @@
+from django import forms
 from django.contrib import admin
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 from .models import VehicleType, VehicleBody, LoadType, \
     Transporter, ExtraExpenses, District, TransporterProfile,\
     Places, Client, ClientAddress
+
+from ckeditor.widgets import CKEditorWidget
 
 class TransporterResource(resources.ModelResource):
     """
@@ -92,6 +95,17 @@ class VehicleTypeResource(resources.ModelResource):
 class VehicleTypeAdmin(ImportExportModelAdmin):
     resource_class = VehicleTypeResource
 
+class ClientAddressAdminForm(forms.ModelForm):
+    address = forms.CharField(widget=CKEditorWidget())
+        
+    class Meta:
+        model = ClientAddress
+        fields = '__all__'
+
+class ClientAddressAdmin(admin.ModelAdmin):
+    form = ClientAddressAdminForm
+
+
 # Register your models here.
 admin.site.register(VehicleType, VehicleTypeAdmin)
 admin.site.register(VehicleBody)
@@ -102,4 +116,4 @@ admin.site.register(District, DistrictAdmin)
 admin.site.register(TransporterProfile, TransProfileAdmin)
 admin.site.register(Places, PlacesAdmin)
 admin.site.register(Client)
-admin.site.register(ClientAddress)
+admin.site.register(ClientAddress, ClientAddressAdmin)
