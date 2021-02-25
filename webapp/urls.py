@@ -38,6 +38,3 @@ urlpatterns = [
     url(r'^api/token/refresh/$', TokenRefreshView.as_view(), name='token_refresh'),
     url(r'^', include(router.urls)), # Adding URL for fcm-django package
 ]
-
-# TEMP DELETE IF NOT REQUIRED
-# curl -X POST -H "Content-Type:application/json" -d "{\"username\":\"eternalshenron\", \"password\":\"Jan081989\"}" http://127.0.0.1:8000/api/token/
