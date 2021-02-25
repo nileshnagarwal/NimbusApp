@@ -3,6 +3,7 @@ Views for the Quotes module.
 """
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
 
@@ -29,6 +30,7 @@ class EnquiryList(generics.ListCreateAPIView):
     and destinations as array of objects. We need to pop this out and pass it to
     the resp serializers.
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Enquiry.objects.all().order_by('-created', 'enquiry_no')
     serializer_class = EnquiryDetailedSerializer
     pagination_class = CursorPagination
@@ -115,6 +117,7 @@ class EnquiryDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic EnquiryDetail View
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Enquiry.objects.all()
     serializer_class = EnquiryDetailedSerializer
 
@@ -122,6 +125,7 @@ class ConfirmEnquiry(generics.UpdateAPIView):
     """
     Confirm Floated Enquiry by providing all the required fields
     """
+    permission_classes = (IsAuthenticated,)
     queryset = Enquiry.objects.all()
     serializer_class = EnquiryDetailedSerializer
 
@@ -152,7 +156,7 @@ class EnquirySearchList(generics.ListAPIView):
     """
     Search Enquiries based on criteria
     """
-    
+    permission_classes = (IsAuthenticated,)
     serializer_class = EnquiryDetailedSerializer
     pagination_class = CursorPagination
 
@@ -298,6 +302,7 @@ class SupplierQuoteList(generics.ListCreateAPIView):
     """
     Generic Supplier Quote List and Create View
     """
+    permission_classes = (IsAuthenticated,)
     queryset = SupplierQuote.objects.all().order_by('-created')
     serializer_class = SupplierQuoteSerializer
 
@@ -328,6 +333,7 @@ class SupplierQuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic EnquiryDetail View
     """
+    permission_classes = (IsAuthenticated,)
     queryset = SupplierQuote.objects.all()
     serializer_class = SupplierQuoteSerializer
 
@@ -335,6 +341,7 @@ class SupplierQuotesForEnquiry(generics.ListCreateAPIView):
     """
     Generic EnquiryDetail View
     """
+    permission_classes = (IsAuthenticated,)
     queryset = SupplierQuote.objects.all().order_by('-created')
     serializer_class = SupplierQuoteSerializer
 
@@ -406,6 +413,7 @@ class SupplierResponseList(generics.ListCreateAPIView):
     """
     Generic ListCreateApi View for Supplier Response
     """
+    permission_classes = (IsAuthenticated,)
     queryset = SupplierResponse.objects.all().order_by('-created', 'response_id')
     serializer_class = SupplierResponseSerializer
 
@@ -413,5 +421,6 @@ class SupplierResponseDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic RetrieveUpdateDestroyAPIView View for Supplier Response
     """
+    permission_classes = (IsAuthenticated,)
     queryset = SupplierResponse.objects.all().order_by('-created', 'response_id')
     serializer_class = SupplierResponseSerializer
