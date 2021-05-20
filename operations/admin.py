@@ -3,14 +3,13 @@ from django.contrib import admin
 from django.db import models
 
 from .models import LorryReceipt, LorryReceiptNo, Item
-from ckeditor.widgets import CKEditorWidget
 
 # Register your models here.
 
 class LorryReceiptAdminForm(forms.ModelForm):
-    consignor_manual = forms.CharField(widget=CKEditorWidget())
-    consignee_manual = forms.CharField(widget=CKEditorWidget())
-    comment = forms.CharField(widget=CKEditorWidget())
+    consignor_manual = forms.CharField()
+    consignee_manual = forms.CharField()
+    comment = forms.CharField()
     
     class Meta:
         model = LorryReceipt

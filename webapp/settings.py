@@ -51,7 +51,6 @@ INSTALLED_APPS = [
     'corsheaders',
     "fcm_django",
     'import_export',
-    'ckeditor'
 ]
 
 MIDDLEWARE = [
@@ -187,16 +186,3 @@ DATABASES['default'].update(db_from_env)
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# CkEditor (RichTextEditor Widget for admin panel rich text editing) Settings 
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'Custom',
-        'toolbar_Custom': [
-            ['Bold'],
-            ['RemoveFormat']
-        ],
-        'height': 150,
-        'width': 300,
-    }
-}

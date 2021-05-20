@@ -6,8 +6,6 @@ from .models import VehicleType, VehicleBody, LoadType, \
     Transporter, ExtraExpenses, District, TransporterProfile,\
     Places, Client, ClientAddress
 
-from ckeditor.widgets import CKEditorWidget
-
 class TransporterResource(resources.ModelResource):
     """
     Refer: https://django-import-export.readthedocs.io/en/latest/
@@ -96,7 +94,7 @@ class VehicleTypeAdmin(ImportExportModelAdmin):
     resource_class = VehicleTypeResource
 
 class ClientAddressAdminForm(forms.ModelForm):
-    address = forms.CharField(widget=CKEditorWidget())
+    address = forms.CharField()
         
     class Meta:
         model = ClientAddress
