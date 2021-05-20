@@ -44,8 +44,8 @@ class LorryReceipt(models.Model):
             on_delete=models.PROTECT, null=True, blank=True, related_name='lr_consignor')
     consignee_id = models.ForeignKey('masters.ClientAddress', on_delete=models.PROTECT,
                 null=True, blank=True, related_name='lr_consignee')
-    consignor_manual = models.CharField(max_length=255, blank=True, null=True)
-    consignee_manual = models.CharField(max_length=255, blank=True, null=True)
+    consignor_manual = models.TextField(max_length=500, blank=True, null=True)
+    consignee_manual = models.TextField(max_length=500, blank=True, null=True)
     consignor_gstin = models.CharField(max_length=255, blank=True, null=True)
     consignee_gstin = models.CharField(max_length=255, blank=True, null=True)
     invoice_no = models.CharField(max_length=255, blank=True, null=True)
