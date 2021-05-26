@@ -4,6 +4,7 @@ Search suitable Transporters based on enquiry
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
+from django.db.models import Q
 
 from quotes.models import Enquiry
 from masters.models import Places, TransporterProfile, Transporter, District
@@ -111,95 +112,28 @@ class MatchingTrans(generics.ListAPIView):
         # districts. Then we'll reverse the case with source matching destination districts and
         # destination matching source districts.
 
-        # Source matching Source districts and Destination matching Destination Districts
-        filtered_trans_1 = TransporterProfile.objects.filter(source_id__in=src_places.values('district_id'))
-        filtered_trans_1 = filtered_trans_1.filter(destination_id__in=dest_places.values('district_id'))
+        # First defining Q objects for enquiry source and destination matching transporter profile
+        # source and destination resp
+        q_source_source = Q(source_id__in=src_places.values('district_id'))
+        q_dest_dest = Q(destination_id__in=dest_places.values('district_id'))
 
-        # If we get 0 transporters from last filter, we'll have to convert the result to queryset
-        # to keep consistency. All our filtered_tran will be querysets.
-        if filtered_trans_1.count() == 0:
-            filtered_trans_1 = TransporterProfile.objects.none()
-        
-        # Source matching Destination districts and Destination matching Source Districts
-        filtered_trans_2 = TransporterProfile.objects.filter(destination_id__in=src_places.values('district_id'))
-        filtered_trans_2 = filtered_trans_2.filter(source_id__in=dest_places.values('district_id'))
-        
-        # If we get 0 transporters from last filter, we'll have to convert the result to queryset
-        # to keep consistency. All our filtered_tran will be querysets.
-        if filtered_trans_2.count() == 0:
-            filtered_trans_2 = TransporterProfile.objects.none()
-        
-        # Define a local var to store the combined queryset
-        filtered_trans = TransporterProfile.objects.none()
-        # Union is used to combine querysets. We could have used | operator but it is producing
-        # errors.
-        filtered_trans = filtered_trans_1.union(filtered_trans_2)
-        
-        # Last step, we filter for load_type and vehicle_type.
-        filtered_trans = filtered_trans.filter(load_type__exact=load_type, \
-            vehicle_type_id__in=vehicle_type)
+        # Second defining Q objects for enquiry destination and source matching transporter profile
+        # source and destination resp
+        q_dest_source = Q(destination_id__in=src_places.values('district_id'))
+        q_source_dest = Q(source_id__in=dest_places.values('district_id'))
 
-        # Store the transporters list as an array in filtered_trans_list
-        filtered_trans_list = filtered_trans.values_list('transporter_id', flat=True).distinct()
-        # Get Transporter Queryset from filtered_trans_list
-        filtered_trans_qs = Transporter.objects.filter(transporter_id__in=filtered_trans_list)
-        # Serializer the qs
+        # Finally defining Q objects for vehicle type and load type 
+        q_vehicle_type = Q(vehicle_type_id__in=vehicle_type.values('vehicle_type_id'))
+        q_load_type = Q(load_type__exact=load_type)
+
+        # Combining Q objects in a chain. & stands for AND operator and | stands for OR operator. 
+        # Refer https://docs.djangoproject.com/en/3.2/topics/db/queries/#complex-lookups-with-q
+        filtered_trans = TransporterProfile.objects.filter((q_source_source & q_dest_dest) | (q_dest_source & q_source_dest))\
+                            .filter(q_vehicle_type).filter(q_load_type)               
+
+        # Get Transporter Queryset from filtered_trans Queryset
+        filtered_trans_qs = Transporter.objects.filter(trans_profile__in=filtered_trans).distinct()
+        # Serialize the qs
         filtered_trans = TransporterSerializer(filtered_trans_qs, many=True)
         # Return the serialized qs
         return filtered_trans
-
-
-# class MatchingTransOld(generics.ListAPIView):
-#     """
-#     Search for mathching transporters for a given enquiry.
-#     """
-#     def get(self, request, *args, **kwargs):
-#         enquiry_id = request.query_params.get('enquiry_id')
-#         print('Enquiry id is ', enquiry_id)
-#         enquiry = Enquiry.objects.get(enquiry_id__exact=enquiry_id)
-#         load_type = enquiry.load_type_new
-#         vehicle_type = enquiry.vehicle_type.all()
-#         print('Load Type: ',load_type)
-#         print('Vehicle Type: ',vehicle_type)
-#         src_places = enquiry.places.filter(src_dest__exact=Places.Source).\
-#             order_by('place_id')
-#         dest_places = enquiry.places.filter(src_dest__exact=Places.Destination).\
-#             order_by('place_id')
-#         src_districts = src_places.values_list('district_id', flat=True)
-#         dest_districts = dest_places.values_list('district_id', flat=True)
-#         # print(places.district_id_set.all())
-#         # src_districts = []
-#         # dest_districts = []
-#         # for place in src_places:
-#         #     src_districts.append(place.district_id)
-#         print('Source Districts ',src_districts)
-#         print('Destination Districts ',dest_districts)
-#         filtered_trans_1 = TransporterProfile.objects.filter(source_id__in=src_districts)
-#         filtered_trans_1 = filtered_trans_1.filter(destination_id__in=dest_districts)
-#         for trans in filtered_trans_1:
-#             print('Filtered Trans 1',trans.transporter_id)
-#         if filtered_trans_1.count() == 0:
-#             filtered_trans_1 = TransporterProfile.objects.none()
-#         print('Places', src_places, dest_places)
-#         filtered_trans_2 = TransporterProfile.objects.filter(destination_id__in=src_districts)
-#         filtered_trans_2 = filtered_trans_2.filter(source_id__in=dest_districts)
-#         if filtered_trans_2.count() == 0:
-#             filtered_trans_2 = TransporterProfile.objects.none()
-#         for trans in filtered_trans_2:
-#             print('Filtered Trans 2',trans.transporter_id)
-#         print('Filtered Trans 1: ', filtered_trans_1, 'Filtered Trans 2: ', filtered_trans_2)
-#         filtered_trans = TransporterProfile.objects.none()
-#         # filtered_trans = filtered_trans_1 | filtered_trans_2
-#         # filtered_trans = chain(filtered_trans_1, filtered_trans_2)
-#         filtered_trans = filtered_trans_1.union(filtered_trans_2)
-#         print('Filtered Trans: ',filtered_trans)
-#         filtered_trans = filtered_trans.filter(load_type__exact=load_type, \
-#             vehicle_type_id__in=vehicle_type)
-#         filtered_trans_list = filtered_trans.values_list('transporter_id', flat=True).distinct()
-#         # qs = TransporterProfile.objects.all()
-#         # test = qs.values_list('transporter_id', flat=True)
-#         # print('Test: ', test)
-#         print('filtered_trans_list: ', filtered_trans_list)
-#         for trans in filtered_trans:
-#             print(trans.transporter_id.transporter_id)
-#         return Response(None, status.HTTP_200_OK)

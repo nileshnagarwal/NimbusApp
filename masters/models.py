@@ -187,7 +187,7 @@ class TransporterProfile(models.Model):
                         on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
-        return '%s' %(self.transporter_id)
+        return 'Transporter Profile: %s, Transporter: %s' %(self.trans_profile_id, self.transporter_id)
 
 class Client(models.Model):
     """
