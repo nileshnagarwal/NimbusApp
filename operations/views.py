@@ -56,7 +56,7 @@ class LorryReceiptNoDetail(generics.RetrieveUpdateDestroyAPIView):
   
 class LorryReceiptList(generics.ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
-    queryset = LorryReceipt.objects.all().order_by('lr_no_id')
+    queryset = LorryReceipt.objects.all().order_by('-lr_no_id')
     serializer_class = LorryReceiptSerializer
     pagination_class = None
 
