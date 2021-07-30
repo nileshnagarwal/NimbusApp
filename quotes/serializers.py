@@ -107,6 +107,7 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
     enquiry = EnquirySerializer(source='enquiry_id', read_only=True)
     linked_trans_profile = serializers.SerializerMethodField('get_linked_trans_profiles', read_only=True)
     traffic_incharge = UserSerializer(source='user_id', read_only=True)
+    vehicle_type_obj = VehicleTypeSerializer(source='vehicle_type_id', many=True, read_only=True)
     
     def get_source(self, quote):
         return get_source(self, quote.enquiry_id)
