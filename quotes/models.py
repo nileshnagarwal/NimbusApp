@@ -67,20 +67,6 @@ class SupplierQuote(models.Model):
     """
     Enter the quotes received from vendors for the received enquiries.
     """
-    searching = "searching"
-    unloading = "unloading"
-    not_avail = "not available"
-    avail = "available"
-    na = "status unknown"
-
-    _vehicle_status_choices = (
-        (searching, "Searching"),
-        (unloading, "Unloading"),
-        (not_avail, "Not Available"),
-        (avail, "Available"),
-        (na, "Status Unknown"),
-    )
-
     quote_id = models.AutoField(primary_key=True)
     enquiry_id = models.ForeignKey('Enquiry', blank=False, null=True,
                                 on_delete=models.PROTECT)
@@ -94,9 +80,7 @@ class SupplierQuote(models.Model):
     freight_excl_org = models.PositiveIntegerField(blank=True, null=True)
     freight_normal_org = models.PositiveIntegerField(blank=True, null=True)
     including_fine = models.CharField(max_length=20, null=True, blank=True)
-    vehicle_avail = models.CharField(max_length=20)
-    vehicle_status = models.CharField(choices=_vehicle_status_choices, max_length=20, 
-                                        null=True, blank=True)
+    vehicle_avail = models.CharField(max_length=20, null=True, blank=True)
     vehicle_type_id = models.ManyToManyField('masters.VehicleType')
     vehicle_body_id = models.ManyToManyField('masters.VehicleBody', blank=True)
     # get_user_model() is used to get the current AUTH_USER_MODEL defined in settings. 
