@@ -113,20 +113,46 @@ class SupplierResponse(models.Model):
     """
     Record responses received from calls to suppliers.
     """
-    Pending = 'Pending'
-    Busy = 'Busy'
-    AwaitingRates = 'Awaiting Rates'
+
+    searching_vehicle = "searching vehicle"
+    vehicle_unloading = "vehicle unloading"
+    not_avail = "not available"
+    avail = "available"
+    na = "status unknown"
+    awaiting_rates = 'awaiting rates'
+    not_interested = 'not interested'
+    incorrect_match = 'incorrect match'
+
+    vehicle_status_options = [
+        searching_vehicle,
+        vehicle_unloading,
+        not_avail,
+        avail,
+        na,
+    ]
+
+    call_status_options = [
+        awaiting_rates,
+        incorrect_match,
+        not_interested,
+    ]
 
     _response_choices = (
-        (Pending, 'Pending'),
-        (Busy, 'Busy'),
-        (AwaitingRates, 'Awaiting Rates'),
+        (searching_vehicle, 'Searching Vehicle'),
+        (vehicle_unloading, 'Vehicle Unloading'),
+        (not_avail, 'Not Available'),
+        (avail, 'Available'),
+        (na, 'Status Unknown'),
+        (awaiting_rates, 'Awaiting Rates'),
+        (not_interested, 'Not Interested'),
+        (incorrect_match, 'Incorrect Match'),
     )
 
     response_id = models.AutoField(primary_key=True)
     enquiry_id = models.ForeignKey('Enquiry', blank=False, null=False, on_delete=models.PROTECT)
     transporter_id = models.ForeignKey('masters.Transporter', blank=False, null=False, on_delete=models.PROTECT)
-    response = models.CharField(max_length=20, choices=_response_choices, default=Pending, blank=False)
+    quote_id = models.ForeignKey('SupplierQuote', blank=True, null=True, related_name='response', on_delete=models.SET_NULL)
+    response = models.CharField(max_length=20, choices=_response_choices, blank=False, null=False)
 
     def __str__(self):
         return '%s: %s - %s' %(self.transporter_id, self.enquiry_id, self.response)
