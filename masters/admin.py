@@ -94,7 +94,6 @@ class VehicleTypeAdmin(ImportExportModelAdmin):
     resource_class = VehicleTypeResource
 
 class ClientAddressAdminForm(forms.ModelForm):
-    address = forms.CharField()
         
     class Meta:
         model = ClientAddress

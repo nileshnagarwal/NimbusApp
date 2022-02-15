@@ -206,7 +206,7 @@ class ClientAddress(models.Model):
     """
 
     client_address_id = models.AutoField(primary_key=True)
-    address = models.CharField(max_length=255, null=False, blank=False)
+    address = models.TextField(max_length=500, null=False, blank=False)
     gstin = models.CharField(max_length=15, null=True, blank=True)
     client_id = models.ForeignKey('Client', on_delete=models.PROTECT,
             blank=False, null=False)
