@@ -204,6 +204,9 @@ class OldestEmptyLorryReceiptNo(generics.ListAPIView):
             # We create a benchmark set that contains all the nos between first lr and last lr
             benchmark_set = set(range(lr_nos[0],lr_nos[-1]+1))
             # the list of missing lr can be found by subtracting the benchmark_set from lr_no_set
+            missing_lrs = sorted(benchmark_set - lr_no_set)
+            if len(missing_lrs) == 0:                
+                return Response({'lr_no': [last_lr+1]})
             return Response({'lr_no': sorted(benchmark_set - lr_no_set)}, status.HTTP_200_OK)
             # The next statement is to get the first missing lr using a custom made function
             # get_blank_lr is the custom made function
