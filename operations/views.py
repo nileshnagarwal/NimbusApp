@@ -6,6 +6,8 @@ from rest_framework.response import Response
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from math import log, ceil, floor
+
 import string
 import random
 import json
@@ -172,37 +174,40 @@ class LorryReceiptNoUniqueCheck(generics.CreateAPIView):
 
 class OldestEmptyLorryReceiptNo(generics.ListAPIView):
     """
-    Retrieve the oldest LR No that has not yet been engaged
+    Retrieve the oldest LR No that has not yet been engaged.
+    Implemented using 2 methods. Inbuilt set function and custom made function using
+    bubble sort type of method.
     """
     permission_classes = (IsAuthenticated, )
     queryset = LorryReceiptNo.objects.all().order_by('lr_no')
     serializer_class = LorryReceiptNoSerializer
 
+    # Overriding the get method
     def get(self, request, *args, **kwargs):
-        # Get lr_no if provided
-        data_copy = request.data.copy()        
-        lr_no = data_copy.get('lr_no', None)
-        """
-        If JSON data is sent to api then we get Dict datatype in request.data.
-        Else if form-data is sent to api we get QueryDict datatype.
-        For QueryDict we need to convert the lr_no from str to int. 
-        In case of Dict the lr_no will already be int so this step will be 
-        skipped.
-        """
-        if (type(lr_no) is str):
-            try:
-                lr_no = int(lr_no)
-            # if lr_no is not int, return error
-            except ValueError:
-                return Response("LR No needs to be an integer", \
-                status.HTTP_400_BAD_REQUEST)
-        # If lr_no is not provided, consider it to be 1
-        if (lr_no is None or lr_no==0):
-            lr_no = 1        
-        # Search for empty lr_no
-        lr_no = empty_lr_search(lr_no)
-        return Response(lr_no, status.HTTP_200_OK)
-        
+        # Get a list of lr nos
+        lr_nos = list(self.queryset.values_list('lr_no', flat=True).order_by('lr_no'))        
+        full_length = len(lr_nos)
+        # full_length gives the total length of the list and this var will remain unchanged
+        # get the first and last lr no
+        first_lr = lr_nos[0]
+        last_lr = lr_nos[full_length-1]
+        # Get the numerical difference between last lr and first lr using a predefined function
+        diff = difference(lr_nos)
+        # Now if the difference equals full_length, then there are no lr missing in the middle
+        # In this case return the next lr by incrementing by 1
+        if (difference == full_length):
+            return Response({'lr_no': last_lr+1}, status.HTTP_200_OK)
+        # Else we need to search for the first missing lr in between our list
+        else:
+            # In this case we convert the lr_nos list to set
+            lr_no_set = set(lr_nos)
+            # We create a benchmark set that contains all the nos between first lr and last lr
+            benchmark_set = set(range(lr_nos[0],lr_nos[-1]+1))
+            # the list of missing lr can be found by subtracting the benchmark_set from lr_no_set
+            return Response({'lr_no': sorted(benchmark_set - lr_no_set)}, status.HTTP_200_OK)
+            # The next statement is to get the first missing lr using a custom made function
+            # get_blank_lr is the custom made function
+            # return Response({'lr_no': get_blank_lr(lr_nos, 1, full_length)}, status.HTTP_200_OK)
 
 class LorryReceiptDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsAuthenticated,)
@@ -241,3 +246,77 @@ def empty_lr_search(lr_no=1):
             return lr_no
         else:
             lr_no += 1
+
+""" 
+Custom made function to find a missing LR from a list of LRs.
+This function will be used recursively to divide the list in
+two halves and check each half individually as a fresh list.
+If the length of the list is even, then the division will
+be with two common elements in the middle. If the length of the list
+is odd, then the division of the list will be with one common element
+in the middle.
+Eg: For a list of 1 to 10, the two halves will be 1-6 & 5-10
+For a list of 1 to 11, the two halves will be 1-6 & 6-11.
+"""
+"""
+def get_blank_lr(lr_nos, counter, full_length):
+    # Get the last LR and the first LR
+    first_lr = lr_nos[0]
+    last_lr = lr_nos[len(lr_nos)-1]
+    # The function cannot take more iterations than the
+    # full_length of the whole list
+    while counter <= full_length:
+        length = len(lr_nos)
+        # Check if length is even or odd
+        if length%2 == 0:
+            even = True
+        else:
+            even = False
+        diff = difference(lr_nos)
+        # If even divide with 2 common elements
+        if even:
+            lr_nos_1 = lr_nos[0:(ceil(length/2))+1]
+        # If odd divide with 1 common element
+        else:
+            lr_nos_1 = lr_nos[0:(ceil(length/2))]
+        # Check if the list has any missing lrs
+        res = find_faulty_list(lr_nos_1)
+        # If answer has been received, return the answer
+        if(res['exit_flag']):
+            return res['answer']
+        # Else if faulty rerun the get_blank_lr function with this list
+        else:
+            if (res['faulty']):
+                return get_blank_lr(lr_nos_1, counter + 1, full_length)
+        # Else follow the same process wiith the second half of the list
+        if even:
+            lr_nos_2 = lr_nos[(floor(length/2))-1:length]
+        else:
+            lr_nos_2 = lr_nos[(floor(length/2)):length]
+        # No need to check if the second half is faulty as we already know it is
+        # Only check if we already have achieved an answer or rerun the recursive func
+        if len(lr_nos_2) == 2:
+            return lr_nos_2[0] + 1
+        else:
+            return get_blank_lr(lr_nos_2, counter + 1, full_length)
+    return None
+
+# Evaluate if the list supplied has any missing LRs
+def find_faulty_list(lr_nos):
+    diff = difference(lr_nos)
+    length = len(lr_nos)
+    if diff > length:
+        # If length is 2, we already have the answer
+        if length == 2:
+            return {'exit_flag': True, 'answer': lr_nos[0] + 1}
+        # Else we only know its faulty
+        else: return {'exit_flag': False, 'faulty': True}
+    else:
+        return {'exit_flag': False, 'faulty': False}
+"""
+
+# Get the numberical difference between the last lr and first lr
+def difference(lr_nos):
+    first_lr = lr_nos[0]
+    last_lr = lr_nos[len(lr_nos)-1]
+    return last_lr - first_lr + 1
