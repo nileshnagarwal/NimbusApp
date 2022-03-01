@@ -207,7 +207,7 @@ class OldestEmptyLorryReceiptNo(generics.ListAPIView):
             missing_lrs = sorted(benchmark_set - lr_no_set)
             if len(missing_lrs) == 0:                
                 return Response({'lr_no': [last_lr+1]})
-            return Response({'lr_no': sorted(benchmark_set - lr_no_set)}, status.HTTP_200_OK)
+            return Response({'lr_no': missing_lrs}, status.HTTP_200_OK)
             # The next statement is to get the first missing lr using a custom made function
             # get_blank_lr is the custom made function
             # return Response({'lr_no': get_blank_lr(lr_nos, 1, full_length)}, status.HTTP_200_OK)
