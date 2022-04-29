@@ -40,10 +40,12 @@ class LorryReceiptSerializer(serializers.ModelSerializer):
 
     # to_internal_value converts the value to avoid validation error
     # Without this we get error saying weight should be an integer
-    # despite having null=True and default=0
+    # despite having null=True and default=0. Same for expiry date.
     def to_internal_value(self, data):
         if data.get('weight') == '':
-            data['weight'] = 0
+            data['weight'] = 0.0
+        if data.get('ewaybill_expiry_date') == '':
+            data['ewaybill_expiry_date'] = None
         
         return super(LorryReceiptSerializer, self).to_internal_value(data)
 
