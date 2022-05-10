@@ -44,7 +44,9 @@ class LorryReceiptSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         if data.get('weight') == '':
             data['weight'] = 0.0
-       
+        if data.get('ewaybill_expiry_date') == '':
+            data['ewaybill_expiry_date'] = None
+        
         return super(LorryReceiptSerializer, self).to_internal_value(data)
 
 class LorryVerifySerializer(serializers.ModelSerializer):

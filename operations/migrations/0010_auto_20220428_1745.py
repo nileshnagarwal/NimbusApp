@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='lorryreceipt',
             name='weight',
-            field=models.DecimalField(blank=True, decimal_places=2, default=0, max_digits=5, null=True),
+            field=models.DecimalField(blank=True, decimal_places=2, default=0, max_digits=6, null=True),
         ),
     ]
