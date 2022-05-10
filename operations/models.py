@@ -59,8 +59,6 @@ class LorryReceipt(models.Model):
     comment = models.CharField(max_length=255, blank=True, null=True)
     size = models.CharField(max_length=255, blank=True, null=True)
     weight = models.DecimalField(max_digits=5, decimal_places=2, default=0, blank=True, null=True)
-    challan_no = models.IntegerField(blank=False, null=False)
-    ewaybill_expiry_date = models.DateField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     user_id = models.ForeignKey(get_user_model(), blank=True,null=True, 
