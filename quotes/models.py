@@ -127,6 +127,7 @@ class SupplierResponse(models.Model):
     enquiry_id = models.ForeignKey('Enquiry', blank=False, null=False, on_delete=models.PROTECT)
     transporter_id = models.ForeignKey('masters.Transporter', blank=False, null=False, on_delete=models.PROTECT)
     response = models.CharField(max_length=20, choices=_response_choices, default=Pending, blank=False)
+    quote_id = models.ForeignKey('SupplierQuote', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return '%s: %s - %s' %(self.transporter_id, self.enquiry_id, self.response)

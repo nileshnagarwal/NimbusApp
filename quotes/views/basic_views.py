@@ -7,8 +7,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.pagination import CursorPagination
 
+from django.core.exceptions import ObjectDoesNotExist
+
 from quotes.models import Enquiry, SupplierQuote, SupplierResponse
-from quotes.serializers import EnquiryDetailedSerializer, EnquirySerializer, SupplierQuoteSerializer, SupplierResponseSerializer
+from quotes.serializers import EnquiryDetailedSerializer, EnquirySerializer, SupplierQuoteSerializer, SupplierResponseQuoteSerializer, SupplierResponseSerializer
 from quotes.views.update_trans_profile import UpdateTransProfile
 from masters.serializers import PlacesSerializer
 from masters.models import Places, VehicleType, LoadType
@@ -320,14 +322,13 @@ class SupplierQuoteList(generics.ListCreateAPIView):
         serializer = SupplierQuoteSerializer(quotes, many=True)
         return Response(serializer.data)
 
-    # Overriding Post method to save transporter profile after
-    # saving the quotation
-    def post(self, request, *args, **kwargs):
-        # Saving the quotation calling super post method
-        response = super().post(request, *args, **kwargs)
-        # Saving transporter profile
+    # Defining perform_create function which acts as a post_save signal
+    # It gets executed after the quote gets saved to the db
+    def perform_create(self, serializer):
+        # First save the quote and get its instance
+        instance = serializer.save()
+        # Then run the update_trans_profile method
         UpdateTransProfile.update_trans_profile()
-        return Response(response.data, status.HTTP_201_CREATED)
 
 class SupplierQuoteDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -415,8 +416,59 @@ class SupplierResponseList(generics.ListCreateAPIView):
     """
     permission_classes = (IsAuthenticated,)
     queryset = SupplierResponse.objects.all().order_by('-created', 'response_id')
-    serializer_class = SupplierResponseSerializer
+    serializer_class = SupplierResponseQuoteSerializer
 
+    # Override post method to extract quote object from request and save the quote.
+    # def post(self, request, *args, **kwargs):
+    #     request_copy = request._request
+    #     quote = request.data.pop("quote")
+    #     response = request.data.pop("response")        
+    #     # request.data.update(quote)
+    #     # request_copy.data.update(quote)
+    #     # request_copy.body._read_started = False
+    #     # request_copy = request._request
+    #     response = SupplierQuoteList.as_view()(request=request_copy)
+    #     # response = super().post(request, *args, **kwargs)
+    #     return Response(None,status.HTTP_400_BAD_REQUEST)
+    #     # super().post(request, *args, **kwargs)
+    #     # try:
+    #     #     if (request.data["quote"]):
+    #     #         quote = request.data.pop("quote")
+    #     #         try:
+
+    #     #             # quote_serializer = SupplierQuoteSerializer(data=quote)
+    #     #             # if quote_serializer.is_valid():
+    #     #             #     quote_instance = quote_serializer.save()
+    #     #             request_for_quote = request._request
+    #     #             request_for_quote.data = quote
+    #     #             quote_instance = SupplierQuoteList.as_view()(request=request_for_quote).data
+    #     #         except:                
+    #     #             return Response("Unknown Error Occured while saving quote", \
+    #     #                 status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #     #         try:
+    #     #             supplier_response = request.data.pop("response")
+    #     #         except:
+    #     #             quote_instance.delete()
+    #     #             return Response("response object should be provided in request", \
+    #     #                 status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #     #         try:
+    #     #             supplier_response["quote_id"] = quote_serializer.data["quote_id"]
+    #     #             response_serializer = SupplierResponseSerializer(data=supplier_response)
+    #     #             if response_serializer.is_valid():
+    #     #                 response_instance = response_serializer.save()
+    #     #                 return Response(response_serializer.data,status.HTTP_201_CREATED)
+    #     #             else:
+    #     #                 return Response(response_serializer.errors, status.HTTP_400_BAD_REQUEST)
+    #     #         except:
+    #     #             quote_instance.delete()
+
+    #     # except (ObjectDoesNotExist, KeyError):
+    #     #     return Response("quote object should be provided in the \
+    #     #         request. It can be kept blank if no quote has been received.")
+
+                
+            
+            
 class SupplierResponseDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Generic RetrieveUpdateDestroyAPIView View for Supplier Response

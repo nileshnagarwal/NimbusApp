@@ -125,14 +125,19 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
         Check if either the freight_incl or freight_excl or freight_normal is provided
         """
         # Get enquiry instance
-        enquiry = Enquiry.objects.get(pk=data['enquiry_id'].enquiry_id)
+        try:
+            enquiry = data['enquiry_id']
+        except: 
+            raise serializers.ValidationError("enquiry not found")
         # If load_type is ODC, either incl or excl freight must be provided
+        # Get benchmark_initial_data
+        benchmark_initial_data = self.get_initial_data()
         # Check If load is ODC
         if (enquiry.load_type_new.load_size==LoadType.odc):
-            # Check if either freight_incl or freight_excl should be provided
-            if (self.initial_data['freight_incl'] is None and self.initial_data['freight_excl'] is None):
-                raise serializers.ValidationError("For ODC cargo, " + \
-                    "either freight_incl_org or freight_excl_org should be provided.")
+            # Check if either freight_incl or freight_excl has been provided
+            if not bool(benchmark_initial_data.get('freight_incl')) and \
+                not bool(benchmark_initial_data.get('freight_excl')):
+                self.raise_error(enquiry.load_type_new.load_size)            
             # If we are updating an old quote
             elif (self.instance):
                 # data will be modified by validate_update_freight
@@ -140,19 +145,19 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
             # If we are creating a new quote and either freight_incl or freight_excl
             # is provided, set data['freight_incl_org'] and data['freight_excl_org']
             else:
-                if (self.initial_data['freight_incl']):
-                    data['freight_incl_org'] = self.initial_data['freight_incl']
-                if (self.initial_data['freight_excl']):
-                    data['freight_excl_org'] = self.initial_data['freight_excl']
+                if (benchmark_initial_data['freight_incl']):
+                    data['freight_incl_org'] = benchmark_initial_data['freight_incl']
+                if (benchmark_initial_data['freight_excl']):
+                    data['freight_excl_org'] = benchmark_initial_data['freight_excl']
         # Else normal freight must be provided
         else:
             # Logic is same as that for ODC. Refer above
-            if (self.initial_data['freight_normal'] is None):
-                raise serializers.ValidationError("Freight needs to be provided.")
+            if not bool(benchmark_initial_data.get('freight_normal')):
+                self.raise_error(enquiry.load_type_new.load_size)
             elif (self.instance):
                 data = self.validate_update_freight(data)
             else:
-                data['freight_normal_org'] = self.initial_data['freight_normal']
+                data['freight_normal_org'] = benchmark_initial_data['freight_normal']
         return super().validate(data)
 
     def validate_update_freight(self, data):
@@ -252,6 +257,33 @@ class SupplierQuoteSerializer(serializers.ModelSerializer):
         else:
             return data
     
+    def get_initial_data(self):
+        """
+        If the validate function is called from a nested serializer, return parent.initial_data,
+        else return initial_data
+        """
+        if hasattr(self, 'initial_data'):
+            return self.initial_data
+        if hasattr(self, 'parent'):
+            return self.parent.initial_data['quote']
+        raise serializers.ValidationError("initial_data not found")
+    
+    def raise_error(self, load_type):
+        """
+        Depending upon the load_type raise the appropriate error
+        """
+        # try:
+        error = {
+            LoadType.odc: "either freight_incl or freight_excl should be provided",
+            LoadType.ftl: "freight_normal should be provided",
+            LoadType.ltl: "freight_normal should be provided"
+        }
+        if load_type in error:
+            raise serializers.ValidationError(error.get(load_type))
+        else: 
+            raise serializers.ValidationError("Unknown error occured. Check raise_error method")
+
+    
     class Meta:
         model = SupplierQuote
         fields = '__all__'
@@ -277,3 +309,32 @@ class SupplierResponseSerializer(serializers.ModelSerializer):
     class Meta:
         model = SupplierResponse
         fields = '__all__'
+
+class SupplierResponseQuoteSerializer(serializers.Serializer):
+    """
+    Single serializer for saving Supplier Response along with Quote instances
+    """
+    
+    quote = SupplierQuoteSerializer(required=False)
+    response = SupplierResponseSerializer()
+    
+    # def validate(self, data):
+    #     data.update(self.initial_data['quote'])
+        
+    #     return data
+
+    def create(self, validated_data):
+        response_data = validated_data.pop('response')
+        try:
+            quote_data = validated_data.pop('quote')
+            vehicle_type = quote_data.pop('vehicle_type_id')
+            quote = SupplierQuote.objects.create(**quote_data)
+            quote.vehicle_type_id.set(vehicle_type)
+        except:
+            quote = None
+        response = SupplierResponse.objects.create(quote_id=quote, **response_data)
+        return {"quote":quote, "response":response}
+        # self.quote(data=validated_data.pop('quote'))
+        # quote_instance = self.quote.save()
+        # self.response(data=validated_data('response'))
+        # response_instance = self.response.save(quote_id=quote_instance)
