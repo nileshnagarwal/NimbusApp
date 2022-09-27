@@ -6,7 +6,7 @@ from .models import VehicleBody, VehicleType, LoadType, Transporter, \
 from .serializers import VehicleBodySerializer, VehicleTypeSerializer, \
     LoadTypeSerializer, TransporterSerializer, ExtraExpensesSerializer, Places, \
     PlacesSerializer, DistrictSerializer, TransporterProfileSerializer, \
-    ClientSerializer, ClientAddressSerializer
+    ClientSerializer, ClientAddressSerializer, TransporterProfileWithTransporterSerializer
 
 # Create your views here.
 class VehicleTypeList(generics.ListCreateAPIView):
@@ -116,14 +116,14 @@ class TransporterProfileList(generics.ListCreateAPIView):
     """Creating List and Post functions for District model"""
     permission_classes = (IsAuthenticated,)
     queryset = TransporterProfile.objects.all().order_by('trans_profile_id')
-    serializer_class = TransporterProfileSerializer
+    serializer_class = TransporterProfileWithTransporterSerializer
     pagination_class = None
 
 class TransporterProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     """Creating RUD functions for District model"""
     permission_classes = (IsAuthenticated,)
     queryset = TransporterProfile.objects.all()
-    serializer_class = TransporterProfileSerializer
+    serializer_class = TransporterProfileWithTransporterSerializer
     pagination_class = None
 
 class ClientList(generics.ListCreateAPIView):

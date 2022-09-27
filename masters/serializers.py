@@ -75,6 +75,13 @@ class TransporterProfileSerializer(serializers.ModelSerializer):
         model = TransporterProfile
         fields = '__all__'
 
+class TransporterProfileWithTransporterSerializer(serializers.ModelSerializer):
+    transporter_obj = TransporterSerializer(source='transporter_id', read_only=True)
+
+    class Meta:
+        model = TransporterProfile
+        fields = '__all__'
+
 class ClientSerializer(serializers.ModelSerializer):
     """
     Client ModelSerializer.

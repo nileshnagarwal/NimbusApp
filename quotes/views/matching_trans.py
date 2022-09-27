@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from quotes.models import Enquiry
 from masters.models import Places, TransporterProfile, Transporter, District
-from masters.serializers import TransporterSerializer
+from masters.serializers import TransporterProfileWithTransporterSerializer, TransporterSerializer
 
 # Create your views here
 
@@ -104,6 +104,8 @@ class MatchingTrans(generics.ListAPIView):
         # From enquiry, get load_type and vehicle_type
         load_type = enquiry.load_type_new
         vehicle_type = enquiry.vehicle_type.all()
+        vehicle_type_instance = vehicle_type.first()
+        vehicle_category = vehicle_type_instance.category
 
         # Now we'll filter for transporters providing transportation from 
         # the list of source and destination (list received may include nerighbors).
@@ -123,17 +125,16 @@ class MatchingTrans(generics.ListAPIView):
         q_source_dest = Q(source_id__in=dest_places.values('district_id'))
 
         # Finally defining Q objects for vehicle type and load type 
-        q_vehicle_type = Q(vehicle_type_id__in=vehicle_type.values('vehicle_type_id'))
+        q_vehicle_category = Q(vehicle_type_id__in=vehicle_type)
+        # q_vehicle_category = Q(vehicle_type_id__category__exact=vehicle_category)
         q_load_type = Q(load_type__exact=load_type)
 
         # Combining Q objects in a chain. & stands for AND operator and | stands for OR operator. 
         # Refer https://docs.djangoproject.com/en/3.2/topics/db/queries/#complex-lookups-with-q
-        filtered_trans = TransporterProfile.objects.filter((q_source_source & q_dest_dest) | (q_dest_source & q_source_dest))\
-                            .filter(q_vehicle_type).filter(q_load_type)               
+        filtered_trans_qs = TransporterProfile.objects.filter((q_source_source & q_dest_dest) | (q_dest_source & q_source_dest))\
+                            .filter(q_vehicle_category).filter(q_load_type)               
 
-        # Get Transporter Queryset from filtered_trans Queryset
-        filtered_trans_qs = Transporter.objects.filter(trans_profile__in=filtered_trans).distinct()
-        # Serialize the qs
-        filtered_trans = TransporterSerializer(filtered_trans_qs, many=True)
         # Return the serialized qs
+        filtered_trans = TransporterProfileWithTransporterSerializer(filtered_trans_qs, many=True)
+        
         return filtered_trans
