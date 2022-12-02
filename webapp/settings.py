@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'fjf7vi$7%mp3ia(e!t(iapr=ggfn6h
 DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = [
-    'nimbusdjango.herokuapp.com',
+    'nimbusdjango.up.railway.app',
     '127.0.0.1',
     'localhost',
 ]
