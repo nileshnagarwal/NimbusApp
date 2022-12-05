@@ -338,3 +338,16 @@ class SupplierResponseQuoteSerializer(serializers.Serializer):
         # quote_instance = self.quote.save()
         # self.response(data=validated_data('response'))
         # response_instance = self.response.save(quote_id=quote_instance)
+
+class MatchingTransporter(serializers.ModelSerializer):
+    """
+    MatchingTransporter Model Serializer
+    """
+    rank = serializers.SerializerMethodField('get_rank', read_only=True)
+
+    def get_rank(self, matching_trans):
+        return (int(matching_trans.source_level)*3) + int(matching_trans.dest_level) + 1
+    
+    class Meta:
+        model = MatchingTransporter
+        fields = '__all__'

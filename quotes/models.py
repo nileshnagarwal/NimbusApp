@@ -131,3 +131,15 @@ class SupplierResponse(models.Model):
 
     def __str__(self):
         return '%s: %s - %s' %(self.transporter_id, self.enquiry_id, self.response)
+
+class MatchingTransporter(models.Model):
+    """
+    Matching Transporters with a given enquiry based on the source and destination level filters
+    """
+    _level_options = range(3)
+    _response_choices = tuple(zip(_level_options, _level_options))
+    enquiry_id = models.ForeignKey('Enquiry', blank=False, null=False, on_delete=models.CASCADE, \
+        related_name='matching_transporters')
+    transporter_id = models.ManyToManyField('masters.Transporter', blank=False, null=False, on_delete=models.PROTECT)
+    source_level = models.PositiveIntegerField(choices=_response_choices, blank=False)
+    dest_level = models.PositiveIntegerField(choices=_response_choices, blank=False)
