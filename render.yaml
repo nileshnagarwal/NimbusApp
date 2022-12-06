@@ -11,17 +11,17 @@ services:
     envVars:
       - key: DJANGO_DEBUG # Imported from Heroku app
         value: False
-      # - key: DATABASE_URL # Render PostgreSQL database
-      #   fromDatabase:
-      #     name: postgresql-adjacent-42828
-      #     property: connectionString
+      - key: DATABASE_URL # Render PostgreSQL database
+        fromDatabase:
+          name: postgresql-adjacent-42828
+          property: connectionString
       # - key: DATABASE_URL # Render PostgreSQL database
       #   fromDatabase:
       #     name: postgresql-trapezoidal-85250
       #     property: connectionString
 
 databases: # Render PostgreSQL database
-  # - name: postgresql-adjacent-42828
-  #   ipAllowList: [] # only allow internal connections
+  - name: postgresql-adjacent-42828
+    ipAllowList: [] # only allow internal connections
   # - name: postgresql-trapezoidal-85250
   #   ipAllowList: [] # only allow internal connections
