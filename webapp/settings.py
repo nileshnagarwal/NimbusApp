@@ -161,7 +161,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATIC_URL = '/static/'
 
-CORS_ORIGIN_WHITELIST = ('localhost:8080', 'localhost:3000', \
+CORS_ALLOWED_ORIGIN = ('localhost:8080', 'localhost:3000', \
 '192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
 'localhost:4300', '192.168.1.10:5050', 'neeluroadways.in', \
 'nimbuslogistics.in', 'https://www.neeluroadways.in', \
