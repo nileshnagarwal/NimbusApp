@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -62,7 +63,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 ]
 
@@ -165,7 +165,7 @@ CORS_ALLOWED_ORIGIN = ('localhost:8080', 'localhost:3000', \
 '192.168.1.10:8080', '192.168.1.10:4200', 'localhost:4200', \
 'localhost:4300', '192.168.1.10:5050', 'neeluroadways.in', \
 'nimbuslogistics.in', 'https://www.neeluroadways.in', \
-'https://www.neeluroadways.in/', '')
+'https://www.neeluroadways.in/', 'https://neeluroadways.in/', )
 
 # fcm-django settings. Refer: https://github.com/xtrinch/fcm-django
 FCM_DJANGO_SETTINGS = {
