@@ -102,3 +102,6 @@ db.sqlite3
 !.gitignore
 !.travis.yml
 !.isort.cfg
+
+# Database dumps
+*.dump
